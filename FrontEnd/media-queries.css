@@ -1,0 +1,166 @@
+/* -------------------- Responsive Media Queries -------------------- */
+
+@media (max-width: 1536px) {
+    .container {
+        max-width: 112rem;
+    }
+
+    .hero-grid {
+        width: 78%;
+    }
+}
+
+@media (max-width: 1280px) {
+    .container {
+        width: 90%;
+    }
+
+    .section-heading {
+        width: 72%;
+    }
+
+    .hero-content h1 {
+        font-size: 5.2rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1.2fr 0.8fr 1fr 0.8fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .section {
+        padding: 6rem 0;
+    }
+
+    .section-heading,
+    .hero-text {
+        width: 100%;
+    }
+
+    .hero-grid {
+        width: 90%;
+    }
+
+    .split-layout,
+    .analysis-grid,
+    .awareness-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        min-height: 72vh;
+    }
+
+    .hero-content h1 {
+        font-size: 4.6rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 775px) {
+    .nav {
+        min-height: auto;
+        flex-direction: column;
+        gap: 1.6rem;
+        padding: 1.6rem 0;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        border-radius: 1.6rem;
+    }
+
+    .hero {
+        min-height: auto;
+    }
+
+    .hero-content h1 {
+        font-size: 3.8rem;
+    }
+
+    .hero-text {
+        font-size: 1.7rem;
+    }
+
+    .button-group {
+        flex-wrap: wrap;
+    }
+
+    .wellness-note,
+    .link-card,
+    .quote-card,
+    .awareness-card {
+        padding: 2.6rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575px) {
+    html {
+        font-size: 56.25%;
+    }
+
+    .container {
+        width: 92%;
+    }
+
+    .section {
+        padding: 4.8rem 0;
+    }
+
+    .section-heading h2,
+    .content-block h2,
+    .form-copy h2,
+    .awareness-card h2 {
+        font-size: 3rem;
+    }
+
+    .logo {
+        font-size: 2rem;
+    }
+
+    .nav-links {
+        gap: 0.4rem;
+        padding: 0.6rem;
+    }
+
+    .nav-links a {
+        min-height: 3.6rem;
+        padding: 0.7rem 1.2rem;
+    }
+
+    .hero-content h1 {
+        font-size: 3.2rem;
+    }
+
+    .button-group,
+    .btn {
+        width: 100%;
+    }
+
+    .wellness-note,
+    .link-card,
+    .quote-card,
+    .awareness-card {
+        border-radius: 1.8rem;
+        padding: 2rem;
+    }
+
+    .quote-card p {
+        font-size: 1.9rem;
+    }
+
+    .scroll-top {
+        right: 1.6rem;
+        bottom: 1.6rem;
+    }
+}
