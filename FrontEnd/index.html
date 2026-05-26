@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <!-------------------- HEADER -------------------->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Mental Health Analysis System powered by a Naive Bayes Classifier."
+    />
+    <title>MindBees</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav container" aria-label="Main navigation">
+        <a href="#" class="logo" aria-label="MindBees home">
+          <span class="logo-mark" id="sarvam-main">MB</span>
+          <span id="sarvam-main">MindBees</span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#analysis">Analysis</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+    <!-------------------- BODY -------------------->
+    <main>
+      <section class="hero section" id="home">
+        <div class="container hero-grid">
+          <article class="hero-content">
+            <h1>Mental Health Analysis System powered by Naive Bayes</h1>
+            <p class="hero-text">
+              A data driven interface for collecting wellness indicators,
+              assessing emotions and presenting prediction patterns.
+            </p>
+            <div class="button-group">
+              <a href="#analysis" class="btn btn-primary">Start Analysis</a>
+              <a href="#about" class="btn btn-secondary">Learn More</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section overview-section" id="about">
+        <div class="container split-layout">
+          <article class="content-block">
+            <h2>Supporting early awareness through structured analysis</h2>
+            <p>
+              Mental health is influenced by emotional, behavioral, social and
+              lifestyle factors. A digital analysis system can help organize
+              these indicators into meaningful patterns, supporting users and
+              professionals with clear wellness awareness.
+            </p>
+          </article>
+
+          <aside class="wellness-note">
+            <h3>Human centered guidance</h3>
+            <p>
+              This interface is designed for awareness and educational use. Any
+              serious concern should be discussed with a qualified mental health
+              professional.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section form-section" id="analysis">
+        <div class="container analysis-grid">
+          <article class="form-copy">
+            <h2>Enter a wellness content link for analysis</h2>
+          </article>
+
+          <article class="link-card">
+            <form action="#" method="post" class="link-form">
+              <div class="form-row">
+                <label for="analysis-link">link</label>
+                <input
+                  type="url"
+                  id="analysis-link"
+                  name="analysis-link"
+                  placeholder="https://example.com/article-or-post"
+                />
+              </div>
+
+              <button type="submit" class="btn btn-primary form-button">
+                Analyze Link
+              </button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="section awareness-section">
+        <div class="container awareness-grid">
+          <article class="quote-card">
+            <p>
+              “Just as bees work together to protect the hive, awareness and
+              support help protect emotional wellbeing.”
+            </p>
+          </article>
+
+          <article class="awareness-card">
+            <h2>Designed to encourage reflection, not replace care</h2>
+            <p>
+              A prediction system should support better conversations, healthier
+              self awareness and timely guidance while keeping empathy at the
+              center.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <a href="#home" class="scroll-top" aria-label="Scroll to top">🐝</a>
+    <!-------------------- FOOTER -------------------->
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <section class="footer-brand">
+          <h2>MindBees</h2>
+          <p>
+            Modern mental health analysis powered by transparent machine
+            learning.
+          </p>
+        </section>
+
+        <section>
+          <h3>Quick links</h3>
+          <ul class="footer-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#analysis">Analysis</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </section>
+
+        <section id="contact">
+          <h3>Contact</h3>
+          <address>
+            Email: #<br />
+            Phone: #
+          </address>
+        </section>
+
+        <section>
+          <h3>Social</h3>
+          <ul class="footer-links">
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">Github</a></li>
+            <li><a href="#">Instagram</a></li>
+          </ul>
+        </section>
+      </div>
+
+      <p class="copyright">© Copyright 2026 MindBees. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
