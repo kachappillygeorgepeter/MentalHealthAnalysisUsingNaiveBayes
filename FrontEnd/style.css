@@ -401,6 +401,24 @@ h2:hover .hover-letter {
     cursor: pointer;
 }
 
+.analysis-result {
+    margin-top: 2rem;
+    padding: 1.4rem 1.6rem;
+    border: 0.1rem solid var(--border-yellow-soft);
+    border-radius: 1.4rem;
+    color: var(--color-black-primary);
+    background: var(--overlay-yellow-muted);
+}
+
+.analysis-result:empty {
+    display: none;
+}
+
+.analysis-result[data-type="error"] {
+    border-color: rgba(190, 42, 42, 0.45);
+    background: rgba(190, 42, 42, 0.1);
+}
+
 /* -------------------- Awareness Section -------------------- */
 .awareness-section {
     background: var(--color-white-secondary);
