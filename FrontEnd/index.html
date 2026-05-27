@@ -23,6 +23,7 @@
     />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="media-queries.css" />
+    <link rel="stylesheet" href="toggle-theme.css" />
   </head>
   <body>
     <header class="site-header">
@@ -38,6 +39,15 @@
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
+
+        <input type="checkbox" id="theme-toggle" class="theme-toggle-input" />
+        <label
+          for="theme-toggle"
+          class="theme-toggle-control"
+          aria-label="Toggle dark theme"
+        >
+          <span class="theme-toggle-icon"></span>
+        </label>
       </nav>
     </header>
     <!-------------------- BODY -------------------->
@@ -45,7 +55,53 @@
       <section class="hero section" id="home">
         <div class="container hero-grid">
           <article class="hero-content">
-            <h1>Mental Health Analysis System powered by Naive Bayes</h1>
+            <h1>
+              <span class="hover-letter">M</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">l</span>
+              <span class="hover-letter">H</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">h</span>
+              <span class="hover-letter">A</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">y</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">s</span>
+              <span class="hover-letter">S</span
+              ><span class="hover-letter">y</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">m</span>
+              <span class="hover-letter">p</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">w</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">d</span>
+              <span class="hover-letter">b</span
+              ><span class="hover-letter">y</span>
+              <span class="hover-letter">N</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">v</span
+              ><span class="hover-letter">e</span>
+              <span class="hover-letter">B</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">y</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">s</span>
+            </h1>
             <p class="hero-text">
               A data driven interface for collecting wellness indicators,
               assessing emotions and presenting prediction patterns.
@@ -61,7 +117,57 @@
       <section class="section overview-section" id="about">
         <div class="container split-layout">
           <article class="content-block">
-            <h2>Supporting early awareness through structured analysis</h2>
+            <h2>
+              <span class="hover-letter">S</span
+              ><span class="hover-letter">u</span
+              ><span class="hover-letter">p</span
+              ><span class="hover-letter">p</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">g</span>
+              <span class="hover-letter">e</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">y</span>
+              <span class="hover-letter">a</span
+              ><span class="hover-letter">w</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">s</span>
+              <span class="hover-letter">t</span
+              ><span class="hover-letter">h</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">u</span
+              ><span class="hover-letter">g</span
+              ><span class="hover-letter">h</span>
+              <span class="hover-letter">s</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">u</span
+              ><span class="hover-letter">c</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">u</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">d</span>
+              <span class="hover-letter">a</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">y</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">s</span>
+            </h2>
             <p>
               Mental health is influenced by emotional, behavioral, social and
               lifestyle factors. A digital analysis system can help organize
@@ -84,23 +190,57 @@
       <section class="section form-section" id="analysis">
         <div class="container analysis-grid">
           <article class="form-copy">
-            <h2>Enter a wellness content link for analysis</h2>
+            <h2>
+              <span class="hover-letter">E</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">r</span>
+              <span class="hover-letter">a</span>
+              <span class="hover-letter">s</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">c</span
+              ><span class="hover-letter">e</span>
+              <span class="hover-letter">f</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">r</span>
+              <span class="hover-letter">w</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">s</span>
+              <span class="hover-letter">a</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">y</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">s</span>
+            </h2>
           </article>
 
           <article class="link-card">
             <form action="#" method="post" class="link-form">
               <div class="form-row">
-                <label for="analysis-link">link</label>
-                <input
-                  type="url"
-                  id="analysis-link"
-                  name="analysis-link"
-                  placeholder="https://example.com/article-or-post"
-                />
+                <label for="analysis-sentence">Sentence</label>
+                <textarea
+                  id="analysis-sentence"
+                  name="analysis-sentence"
+                  rows="4"
+                  placeholder="Type a sentence that describes how someone is feeling"
+                ></textarea>
               </div>
 
               <button type="submit" class="btn btn-primary form-button">
-                Analyze Link
+                Analyze Sentence
               </button>
             </form>
           </article>
@@ -117,7 +257,52 @@
           </article>
 
           <article class="awareness-card">
-            <h2>Designed to encourage reflection, not replace care</h2>
+            <h2>
+              <span class="hover-letter">D</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">s</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">g</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">d</span>
+              <span class="hover-letter">t</span
+              ><span class="hover-letter">o</span>
+              <span class="hover-letter">e</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">c</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">u</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">g</span
+              ><span class="hover-letter">e</span>
+              <span class="hover-letter">r</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">f</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">c</span
+              ><span class="hover-letter">t</span
+              ><span class="hover-letter">i</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">n</span
+              ><span class="hover-letter">,</span>
+              <span class="hover-letter">n</span
+              ><span class="hover-letter">o</span
+              ><span class="hover-letter">t</span>
+              <span class="hover-letter">r</span
+              ><span class="hover-letter">e</span
+              ><span class="hover-letter">p</span
+              ><span class="hover-letter">l</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">c</span
+              ><span class="hover-letter">e</span>
+              <span class="hover-letter">c</span
+              ><span class="hover-letter">a</span
+              ><span class="hover-letter">r</span
+              ><span class="hover-letter">e</span>
+            </h2>
             <p>
               A prediction system should support better conversations, healthier
               self awareness and timely guidance while keeping empathy at the
@@ -133,7 +318,16 @@
     <footer class="site-footer">
       <div class="container footer-grid">
         <section class="footer-brand">
-          <h2>MindBees</h2>
+          <h2>
+            <span class="hover-letter">M</span
+            ><span class="hover-letter">i</span
+            ><span class="hover-letter">n</span
+            ><span class="hover-letter">d</span
+            ><span class="hover-letter">B</span
+            ><span class="hover-letter">e</span
+            ><span class="hover-letter">e</span
+            ><span class="hover-letter">s</span>
+          </h2>
           <p>
             Modern mental health analysis powered by transparent machine
             learning.

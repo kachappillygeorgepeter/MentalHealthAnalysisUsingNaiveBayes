@@ -1,0 +1,115 @@
+/* -------------------- Theme Toggle -------------------- */
+
+.theme-toggle-input {
+    position: absolute;
+    width: 0.1rem;
+    height: 0.1rem;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.theme-toggle-control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 4.4rem;
+    height: 4.4rem;
+    margin-left: 1.2rem;
+    border: 0.1rem solid var(--border-yellow-strong);
+    border-radius: 50%;
+    color: var(--color-black-primary);
+    background: var(--color-yellow-primary);
+    box-shadow: 0 1rem 2.4rem var(--shadow-yellow-soft);
+    cursor: pointer;
+    transition: background 0.08s ease, box-shadow 0.08s ease, color 0.08s ease;
+}
+
+.theme-toggle-control:hover {
+    box-shadow: 0 1.4rem 3rem var(--shadow-yellow-soft);
+}
+
+.theme-toggle-icon::before {
+    content: "☼";
+    display: block;
+    font-size: 2.2rem;
+    line-height: 1;
+    transition: transform 0.08s ease;
+}
+
+body,
+.site-header,
+.nav-links,
+.hero,
+.overview-section,
+.form-section,
+.awareness-section,
+.wellness-note,
+.link-card,
+.quote-card,
+.awareness-card,
+.site-footer,
+.btn,
+.form-row input,
+.form-row select,
+.form-row textarea {
+    transition:
+        background 0.08s ease,
+        color 0.08s ease,
+        border-color 0.08s ease,
+        box-shadow 0.08s ease;
+}
+
+.theme-toggle-input:checked + .theme-toggle-control .theme-toggle-icon::before {
+    content: "⏾";
+    transform: rotate(-10deg);
+}
+
+body:has(.theme-toggle-input:checked) {
+    --color-black-primary: #f7f7f2;
+    --color-black-secondary: #d8deea;
+    --color-white-primary: #08111f;
+    --color-white-secondary: #101c2e;
+    --color-gray-primary: #253149;
+    --color-gray-secondary: #9aa8bd;
+    --shadow-black-soft: rgba(0, 0, 0, 0.42);
+    --shadow-black-strong: rgba(0, 0, 0, 0.64);
+    --overlay-white-glass: rgba(8, 17, 31, 0.92);
+    --overlay-yellow-muted: rgba(255, 210, 31, 0.18);
+}
+
+body:has(.theme-toggle-input:checked) .btn-primary,
+body:has(.theme-toggle-input:checked) .logo-mark,
+body:has(.theme-toggle-input:checked) .quote-card,
+body:has(.theme-toggle-input:checked) .scroll-top,
+body:has(.theme-toggle-input:checked) .theme-toggle-control {
+    color: #050505;
+}
+
+body:has(.theme-toggle-input:checked) .btn-secondary {
+    background: #15243a;
+}
+
+body:has(.theme-toggle-input:checked) .nav-links a:hover {
+    color: #050505;
+}
+
+body:has(.theme-toggle-input:checked) .site-footer,
+body:has(.theme-toggle-input:checked) .footer-grid h2,
+body:has(.theme-toggle-input:checked) .footer-grid h3,
+body:has(.theme-toggle-input:checked) .footer-brand p,
+body:has(.theme-toggle-input:checked) address,
+body:has(.theme-toggle-input:checked) .footer-links,
+body:has(.theme-toggle-input:checked) .footer-links a,
+body:has(.theme-toggle-input:checked) .footer-links a:hover,
+body:has(.theme-toggle-input:checked) .footer-links a:active,
+body:has(.theme-toggle-input:checked) .copyright {
+    color: #050505;
+}
+
+@media (max-width: 775px) {
+    .theme-toggle-control {
+        margin-left: 0;
+    }
+}

@@ -17,7 +17,7 @@
     --overlay-white-glass: rgba(255, 255, 255, 0.92);
     --overlay-yellow-muted: rgba(255, 210, 31, 0.12);
 }
-
+/* -------------------- General Styles -------------------- */
 html {
     font-size: 62.5%;
     scroll-behavior: smooth;
@@ -59,7 +59,7 @@ textarea {
     font: inherit;
 }
 
-/* Reusable layout utilities */
+/* -------------------- Specific Styles -------------------- */
 .container {
     width: 88%;
     max-width: 118rem;
@@ -83,6 +83,67 @@ textarea {
     font-size: 3.6rem;
     line-height: 1.2;
 }
+
+h1 .hover-letter,
+h2 .hover-letter {
+    color: inherit;
+    transition: color 0.35s ease;
+}
+
+h1:hover .hover-letter,
+h2:hover .hover-letter {
+    color: var(--color-yellow-primary);
+}
+
+.hover-letter:nth-child(1) { transition-delay: 0s; }
+.hover-letter:nth-child(2) { transition-delay: 0.035s; }
+.hover-letter:nth-child(3) { transition-delay: 0.07s; }
+.hover-letter:nth-child(4) { transition-delay: 0.105s; }
+.hover-letter:nth-child(5) { transition-delay: 0.14s; }
+.hover-letter:nth-child(6) { transition-delay: 0.175s; }
+.hover-letter:nth-child(7) { transition-delay: 0.21s; }
+.hover-letter:nth-child(8) { transition-delay: 0.245s; }
+.hover-letter:nth-child(9) { transition-delay: 0.28s; }
+.hover-letter:nth-child(10) { transition-delay: 0.315s; }
+.hover-letter:nth-child(11) { transition-delay: 0.35s; }
+.hover-letter:nth-child(12) { transition-delay: 0.385s; }
+.hover-letter:nth-child(13) { transition-delay: 0.42s; }
+.hover-letter:nth-child(14) { transition-delay: 0.455s; }
+.hover-letter:nth-child(15) { transition-delay: 0.49s; }
+.hover-letter:nth-child(16) { transition-delay: 0.525s; }
+.hover-letter:nth-child(17) { transition-delay: 0.56s; }
+.hover-letter:nth-child(18) { transition-delay: 0.595s; }
+.hover-letter:nth-child(19) { transition-delay: 0.63s; }
+.hover-letter:nth-child(20) { transition-delay: 0.665s; }
+.hover-letter:nth-child(21) { transition-delay: 0.7s; }
+.hover-letter:nth-child(22) { transition-delay: 0.735s; }
+.hover-letter:nth-child(23) { transition-delay: 0.77s; }
+.hover-letter:nth-child(24) { transition-delay: 0.805s; }
+.hover-letter:nth-child(25) { transition-delay: 0.84s; }
+.hover-letter:nth-child(26) { transition-delay: 0.875s; }
+.hover-letter:nth-child(27) { transition-delay: 0.91s; }
+.hover-letter:nth-child(28) { transition-delay: 0.945s; }
+.hover-letter:nth-child(29) { transition-delay: 0.98s; }
+.hover-letter:nth-child(30) { transition-delay: 1.015s; }
+.hover-letter:nth-child(31) { transition-delay: 1.05s; }
+.hover-letter:nth-child(32) { transition-delay: 1.085s; }
+.hover-letter:nth-child(33) { transition-delay: 1.12s; }
+.hover-letter:nth-child(34) { transition-delay: 1.155s; }
+.hover-letter:nth-child(35) { transition-delay: 1.19s; }
+.hover-letter:nth-child(36) { transition-delay: 1.225s; }
+.hover-letter:nth-child(37) { transition-delay: 1.26s; }
+.hover-letter:nth-child(38) { transition-delay: 1.295s; }
+.hover-letter:nth-child(39) { transition-delay: 1.33s; }
+.hover-letter:nth-child(40) { transition-delay: 1.365s; }
+.hover-letter:nth-child(41) { transition-delay: 1.4s; }
+.hover-letter:nth-child(42) { transition-delay: 1.435s; }
+.hover-letter:nth-child(43) { transition-delay: 1.47s; }
+.hover-letter:nth-child(44) { transition-delay: 1.505s; }
+.hover-letter:nth-child(45) { transition-delay: 1.54s; }
+.hover-letter:nth-child(46) { transition-delay: 1.575s; }
+.hover-letter:nth-child(47) { transition-delay: 1.61s; }
+.hover-letter:nth-child(48) { transition-delay: 1.645s; }
+.hover-letter:nth-child(49) { transition-delay: 1.68s; }
 
 .btn {
     display: inline-flex;
@@ -121,7 +182,7 @@ textarea {
     background: var(--color-yellow-primary);
 }
 
-/* Header */
+/* -------------------- Header Style -------------------- */
 .site-header {
     position: sticky;
     top: 0;
@@ -169,6 +230,7 @@ textarea {
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    margin-left: auto;
     list-style: none;
     color: var(--color-black-secondary);
     font-weight: 700;
@@ -194,7 +256,7 @@ textarea {
     box-shadow: 0 0.8rem 2rem var(--shadow-yellow-soft);
 }
 
-/* Hero */
+/* -------------------- Hero Section -------------------- */
 .hero {
     min-height: 86vh;
     display: flex;
@@ -225,7 +287,7 @@ textarea {
     margin-top: 3.6rem;
 }
 
-/* Overview */
+/* -------------------- Overview Section -------------------- */
 .overview-section {
     background: var(--color-white-secondary);
 }
@@ -278,7 +340,7 @@ textarea {
     box-shadow: 0 2rem 5rem var(--shadow-black-strong);
 }
 
-/* Link analysis form */
+/* -------------------- Link Section -------------------- */
 .form-section {
     background: var(--color-white-primary);
 }
@@ -329,12 +391,17 @@ textarea {
     box-shadow: 0 0 0 0.4rem var(--overlay-yellow-muted);
 }
 
+.form-row textarea {
+    min-height: 12rem;
+    resize: vertical;
+}
+
 .form-button {
     width: 100%;
     cursor: pointer;
 }
 
-/* Awareness */
+/* -------------------- Awareness Section -------------------- */
 .awareness-section {
     background: var(--color-white-secondary);
 }
@@ -369,7 +436,7 @@ textarea {
     font-weight: 700;
 }
 
-/* Back to top */
+/* -------------------- Back to Top -------------------- */
 .scroll-top {
     position: fixed;
     right: 2.4rem;
@@ -421,7 +488,7 @@ textarea {
     }
 }
 
-/* Footer */
+/* -------------------- Footer Styles -------------------- */
 .site-footer {
     color: var(--color-black-secondary);
     background: var(--color-yellow-peach-light);
