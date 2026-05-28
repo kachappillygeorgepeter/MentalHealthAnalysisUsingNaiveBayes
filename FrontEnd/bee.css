@@ -1,0 +1,97 @@
+/* ========== BEE MASCOT MAIN CONTAINER ========== */
+.bee-mascot {
+  /* Custom variables for bee position and rotation */
+  --bee-x: 24px;           /* Horizontal position */
+  --bee-y: 24px;           /* Vertical position */
+  --bee-tilt: 0deg;        /* Rotation angle */
+  --bee-face: 1;           /* Face direction (1 = right, -1 = left) */
+
+  /* Position the bee on the screen */
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;           /* Keep bee on top of everything */
+
+  /* Bee size (responsive to screen size) */
+  width: clamp(2.75rem, 5vw, 4.25rem);
+  height: clamp(2.75rem, 5vw, 4.25rem);
+
+  /* Center content inside the bee container */
+  display: grid;
+  place-items: center;
+
+  user-select: none;       /* Prevent text selection */
+
+  /* Shadow effect */
+  filter: drop-shadow(0 0.55rem 1rem rgba(33, 24, 6, 0.16));
+
+  /* Move bee to position and tilt it */
+  transform:
+    translate3d(var(--bee-x), var(--bee-y), 0)
+    rotate(var(--bee-tilt));
+  transform-origin: center;
+
+  /* Smooth shadow transition on hover */
+  transition: filter 260ms ease;
+
+  /* Better performance for frequent transforms */
+  will-change: transform;
+}
+
+/* ========== BEE EMOJI STYLING ========== */
+.bee-mascot__emoji {
+  display: block;
+
+  /* Bee emoji size (responsive) */
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1;
+
+  /* Make bee bob up and down */
+  animation: bee-bob 2.4s ease-in-out infinite;
+
+  /* Flip bee left/right and scale on hover */
+  transform: scaleX(var(--bee-face)) scale(var(--bee-hover-scale, 1));
+  transform-origin: center;
+
+  /* Smooth animation when scaling */
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ========== BEE HOVER EFFECT ========== */
+.bee-mascot:hover {
+  /* Enlarge bee slightly on hover */
+  --bee-hover-scale: 1.08;
+
+  /* Add glow effect when hovering */
+  filter:
+    drop-shadow(0 0.65rem 1rem rgba(33, 24, 6, 0.38))
+    drop-shadow(0 0 0.8rem rgba(255, 210, 87, 0.64));
+}
+
+/* ========== BOBBING ANIMATION ========== */
+/* Makes the bee gently bob up and down */
+@keyframes bee-bob {
+  0%,
+  100% {
+    /* Start and end position: slightly up */
+    translate: 0 -0.12rem;
+  }
+
+  50% {
+    /* Middle position: slightly down */
+    translate: 0 0.18rem;
+  }
+}
+
+/* ========== ACCESSIBILITY ========== */
+/* For users who prefer reduced motion (accessibility feature) */
+@media (prefers-reduced-motion: reduce) {
+  .bee-mascot,
+  .bee-mascot__emoji {
+    /* Disable animations for users sensitive to motion */
+    animation: none;
+
+    /* Make transitions instant instead of smooth */
+    transition-duration: 0.01ms;
+  }
+}
