@@ -2,14 +2,14 @@
 
 A FastAPI-based backend application that analyzes text and predicts whether the sentiment indicates a depressed or normal emotional state using a Naive Bayes classifier and a MySQL database.
 
-### Install Dependencies
+## Install Dependencies
 
 ```bash
 cd BackEnd
 pip install -r requirements.txt
 ```
 
-### Database Setup
+## Database Setup
 
 1. Start MySQL.
 2. Run the SQL commands in `setup_database.sql`.
