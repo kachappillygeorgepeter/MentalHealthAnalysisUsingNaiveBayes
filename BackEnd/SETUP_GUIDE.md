@@ -15,7 +15,7 @@
 
 Before you start, make sure you have:
 
-- **Python 3.8+** installed ([Download Python](https://www.python.org/))
+- **Python 3.8+** installed ([Download Python](https://www.python.org/)) — **Note:** Python 3.13+ requires scikit-learn 1.5.0 or later
 - **MySQL Server** installed and running ([Download MySQL](https://dev.mysql.com/downloads/mysql/))
 - **MySQL Workbench** or command-line client (optional but helpful)
 - A terminal/command prompt
@@ -46,7 +46,7 @@ pip install -r requirements.txt
 Or install packages individually:
 
 ```bash
-pip install fastapi uvicorn scikit-learn pandas mysql-connector-python pydantic
+pip install fastapi uvicorn scikit-learn>=1.5.0 pandas mysql-connector-python pydantic
 ```
 
 **What each package does:**
