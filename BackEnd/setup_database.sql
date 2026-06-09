@@ -6,7 +6,7 @@ USE mental_health_db;
 -- -----------------------------------------------------------------------------------------------------------
 Create stop_words table Columns: - id - word(unique) CREATE TABLE IF NOT EXISTS stop_words(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    word VARCHAR(100) NOT NULL UNIQUE,
+    word VARCHAR(64) NOT NULL UNIQUE,
     INDEX idx_word(word)
 );
 INSERT INTO stop_words(word)
@@ -151,7 +151,8 @@ VALUES(word);
 -- Creating table for storing emotional words and their Naive Bayes score for being Depressed and Non-Depressed
 CREATE TABLE IF NOT EXISTS emotional_words (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    word VARCHAR(255) NOT NULL UNIQUE,
+    word VARCHAR(64) NOT NULL UNIQUE,
+    count INT NOT NULL DEFAULT 1,
     happy_score FLOAT NOT NULL DEFAULT 0.001,
     sad_score FLOAT NOT NULL DEFAULT 0.001,
     confused_score FLOAT NOT NULL DEFAULT 0.001,
@@ -608,3 +609,24 @@ VALUES ('upset'),
     ('confusion') ON DUPLICATE KEY
 UPDATE word =
 VALUES(word);
+
+-- ------------------------------------------------------------------------------------------------------------
+
+-- Creating a table for storing probability of a message being one of these emotions.
+CREATE TABLE IF NOT EXISTS message_emotion_probabilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    emotion VARCHAR(64) NOT NULL UNIQUE,
+    probability DOUBLE NOT NULL DEFAULT 0.001,
+    count INT NOT NULL DEFAULT 1,
+    INDEX idx_emotion(emotion)
+);
+
+INSERT INTO message_emotion_probabilities (emotion) VALUES 
+    ('happy'),
+    ('sad'),
+    ('confused'),
+    ('angry'),
+    ('fear'),
+    ('disgust'),
+    ('neutral') ON DUPLICATE KEY
+UPDATE word = VALUES(word);
