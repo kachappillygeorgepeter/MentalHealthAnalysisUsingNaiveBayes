@@ -609,9 +609,7 @@ VALUES ('upset'),
     ('confusion') ON DUPLICATE KEY
 UPDATE word =
 VALUES(word);
-
--- ------------------------------------------------------------------------------------------------------------
-
+------------------------------------------------------------------------------------------------------------
 -- Creating a table for storing probability of a message being one of these emotions.
 CREATE TABLE IF NOT EXISTS message_emotion_probabilities (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -620,13 +618,13 @@ CREATE TABLE IF NOT EXISTS message_emotion_probabilities (
     count INT NOT NULL DEFAULT 1,
     INDEX idx_emotion(emotion)
 );
-
-INSERT INTO message_emotion_probabilities (emotion) VALUES 
-    ('happy'),
+INSERT INTO message_emotion_probabilities (emotion)
+VALUES ('happy'),
     ('sad'),
     ('confused'),
     ('angry'),
     ('fear'),
     ('disgust'),
     ('neutral') ON DUPLICATE KEY
-UPDATE word = VALUES(word);
+UPDATE emotion =
+VALUES(emotion);
