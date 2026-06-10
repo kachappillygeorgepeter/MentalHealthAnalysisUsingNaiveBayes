@@ -152,20 +152,20 @@ VALUES(word);
 CREATE TABLE IF NOT EXISTS emotional_words (
     id INT AUTO_INCREMENT PRIMARY KEY,
     word VARCHAR(64) NOT NULL UNIQUE,
-    happy_count INT NOT NULL DEFAULT 1,
-    happy_score FLOAT NOT NULL DEFAULT 0.001,
-    sad_count INT NOT NULL DEFAULT 1,
-    sad_score FLOAT NOT NULL DEFAULT 0.001,
-    confused_count INT NOT NULL DEFAULT 1,
-    confused_score FLOAT NOT NULL DEFAULT 0.001,
-    angry_count INT NOT NULL DEFAULT 1,
-    angry_score FLOAT NOT NULL DEFAULT 0.001,
-    fear_count INT NOT NULL DEFAULT 1,
-    fear_score FLOAT NOT NULL DEFAULT 0.001,
-    disgust_count INT NOT NULL DEFAULT 1,
-    disgust_score FLOAT NOT NULL DEFAULT 0.001,
-    neutral_count INT NOT NULL DEFAULT 1,
-    neutral_score FLOAT NOT NULL DEFAULT 0.001,
+    happy_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    happy_score DOUBLE NOT NULL DEFAULT 0.001,
+    sad_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    sad_score DOUBLE NOT NULL DEFAULT 0.001,
+    confused_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    confused_score DOUBLE NOT NULL DEFAULT 0.001,
+    angry_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    angry_score DOUBLE NOT NULL DEFAULT 0.001,
+    fear_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    fear_score DOUBLE NOT NULL DEFAULT 0.001,
+    disgust_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    disgust_score DOUBLE NOT NULL DEFAULT 0.001,
+    neutral_count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    neutral_score DOUBLE NOT NULL DEFAULT 0.001,
     INDEX idx_word(word)
 );
 -- ------------------------------------------------------------------------------------------------------------
@@ -621,7 +621,7 @@ CREATE TABLE IF NOT EXISTS message_emotion_probabilities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     emotion VARCHAR(64) NOT NULL UNIQUE,
     probability DOUBLE NOT NULL DEFAULT 0.001,
-    count INT NOT NULL DEFAULT 1,
+    count BIGINT UNSIGNED NOT NULL DEFAULT 1,
     INDEX idx_emotion(emotion)
 );
 INSERT INTO message_emotion_probabilities (emotion)
