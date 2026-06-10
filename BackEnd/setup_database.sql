@@ -4,7 +4,7 @@
 CREATE DATABASE IF NOT EXISTS mental_health_db;
 USE mental_health_db;
 -- -----------------------------------------------------------------------------------------------------------
-Create stop_words table Columns: - id - word(unique) CREATE TABLE IF NOT EXISTS stop_words(
+Create stop_words table CREATE TABLE IF NOT EXISTS stop_words(
     id INT AUTO_INCREMENT PRIMARY KEY,
     word VARCHAR(64) NOT NULL UNIQUE,
     INDEX idx_word(word)
@@ -152,13 +152,19 @@ VALUES(word);
 CREATE TABLE IF NOT EXISTS emotional_words (
     id INT AUTO_INCREMENT PRIMARY KEY,
     word VARCHAR(64) NOT NULL UNIQUE,
-    count INT NOT NULL DEFAULT 1,
+    happy_count INT NOT NULL DEFAULT 1,
     happy_score FLOAT NOT NULL DEFAULT 0.001,
+    sad_count INT NOT NULL DEFAULT 1,
     sad_score FLOAT NOT NULL DEFAULT 0.001,
+    confused_count INT NOT NULL DEFAULT 1,
     confused_score FLOAT NOT NULL DEFAULT 0.001,
+    angry_count INT NOT NULL DEFAULT 1,
     angry_score FLOAT NOT NULL DEFAULT 0.001,
+    fear_count INT NOT NULL DEFAULT 1,
     fear_score FLOAT NOT NULL DEFAULT 0.001,
+    disgust_count INT NOT NULL DEFAULT 1,
     disgust_score FLOAT NOT NULL DEFAULT 0.001,
+    neutral_count INT NOT NULL DEFAULT 1,
     neutral_score FLOAT NOT NULL DEFAULT 0.001,
     INDEX idx_word(word)
 );
