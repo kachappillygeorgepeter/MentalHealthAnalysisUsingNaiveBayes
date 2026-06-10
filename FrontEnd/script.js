@@ -7,7 +7,6 @@ const sentenceInput=document.querySelector("#analysis-sentence");
 const submitButton=form?.querySelector(".form-button");
 const API_URL="http://localhost:5000/analyze";
 const resultBox=document.querySelector(".analysis-result");
-
 // Function is used to display messages in the result box. 
 // It accepts a message and an optional type parameter to indicate the nature of the message (e.g., info, success, error).
 function showResult(message, type="info") 

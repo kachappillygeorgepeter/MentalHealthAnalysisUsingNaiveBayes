@@ -47,8 +47,8 @@ def remove_stop_words(text):
 ########################################################################################################################
 ########################################################################################################################
 def perform_actions(cleaned_text):
-    # Placeholder for future processing using the cleaned text.
-    # Replace this logic with the actual prediction or analysis pipeline later.
+    tokens = tokenize(cleaned_text)
+
     return {
         "prediction_message": "pending",
         "confidence": 0.0,
@@ -60,7 +60,7 @@ def perform_actions(cleaned_text):
 ########################################################################################################################
 
 
-def load_stop_words():
+def load_words(isStopWord: int):
     # Setup configuration data for connecting to the database using environment variables
     cfg = {
         "host": os.getenv("DB_HOST"),
@@ -69,7 +69,7 @@ def load_stop_words():
         "database": os.getenv("DB_NAME"),
     }
     try:
-        # Create database connection and fetch stop words from the database, returning them as a set for efficient lookup.
+        # Create database connection and fetch words from the database, returning them as a set for efficient lookup.
         conn = mysql.connector.connect(
             host=cfg["host"],
             user=cfg["user"],
@@ -77,7 +77,10 @@ def load_stop_words():
             database=cfg["database"],
         )
         cur = conn.cursor()
-        cur.execute("SELECT word FROM stop_words")
+        if isStopWord == 0:
+            cur.execute("SELECT word FROM stop_words")
+        else:
+            cur.execute("SELECT word FROM emotional_words")
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -89,8 +92,10 @@ def load_stop_words():
         return set()
 
 
-# A variable of set data type to store stop words.
-STOP_WORDS = load_stop_words()
+# A variable of set data type to store words.
+# if we pass 1 to load_words function, it will load stop words from the database, otherwise it will load emotional words.
+STOP_WORDS = load_words(1)
+EMOTIONAL_WORDS = load_words(0)
 
 
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
