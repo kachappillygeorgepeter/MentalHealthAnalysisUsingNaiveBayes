@@ -1,7 +1,6 @@
 import os
 import re
 
-
 EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
 
 # Add training sentences here. The strings do not need to be cleaned.
@@ -37,71 +36,98 @@ TRAINING_DATA = {
 }
 
 
+# Function to load environment variables from a .env file.
 def load_env_file(file_name):
-    if not os.path.exists(file_name):
+    if not os.path.exists(file_name):  # Check if file exists
         return
 
     with open(file_name, "r", encoding="utf-8") as file:
         for line in file:
             line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
+            if (
+                not line or line.startswith("#") or "=" not in line
+            ):  # Check if line is empty, a comment, or doesn't contain an '=' character, and skip it if so.
                 continue
 
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+            key, value = line.split(
+                "=", 1
+            )  # Split the line into key and value at the first '=' character.
+            os.environ.setdefault(
+                key.strip(), value.strip().strip("'\"")
+            )  # Set the environment variable if it's not already set, stripping whitespace and any surrounding quotes from the value.
 
 
+# Function to establish a connection to the MySQL db.
 def get_connection():
     import mysql.connector
 
+    # Any method for laoding is fine, but we want to be sure to check both the current working directory and the directory containing this script, since the .env files could be in either place depending on how the script is run.
+    # Search relative to the current working directory.
     load_env_file(".env")
     load_env_file("dbDetails.env")
+    # Search relative to the directory containing the current Python file.
     load_env_file(os.path.join(os.path.dirname(__file__), ".env"))
     load_env_file(os.path.join(os.path.dirname(__file__), "dbDetails.env"))
 
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", ""),
-        database=os.getenv("DB_NAME", "mental_health_db"),
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
     )
 
 
+# Function to load words from the database and returning them as a set.
 def get_words_from_table(cursor, table_name):
     cursor.execute(f"SELECT word FROM {table_name}")
     return {row[0].lower() for row in cursor.fetchall()}
 
 
+# Function to tokenize text and to convert it to lowercase.
 def tokenize(text):
     return re.findall(r"\b\w+\b", text.lower())
 
 
+# Function to remove stop words from the text.
 def clean_text(text, emotional_words, stop_words):
     words = tokenize(text)
+    return [
+        word for word in words if word in emotional_words and word not in stop_words
+    ]
 
-    # Set lookup is fast, so this keeps only emotional words quickly.
-    return [word for word in words if word in emotional_words]
 
-
+# Function to add training data.
 def add_training_data():
-    choice = input("Do you want to add training data now? (y/n): ").lower().strip()
-    if choice != "y":
+    # Keep prompting until the user enters a valid response ('y' or 'n').
+    while True:
+        choice = input("Do you want to add training data now? (y/n): ").lower().strip()
+        if choice in ("y", "n"):
+            break
+        print("Please enter 'y' or 'n'. Try again.")
+
+    if choice == "n":
         return
 
     for emotion in EMOTIONS:
         print(f"\nEnter training sentences for {emotion}. Press Enter to stop.")
         while True:
             sentence = input(f"{emotion}: ").strip()
-            if not sentence:
+            if (
+                not sentence
+            ):  # To break out from a particular emotion input loop, the user can just press Enter without typing anything.
                 break
             TRAINING_DATA[emotion].append(sentence)
 
 
+# Function to collect data for training naive bayes model and for db updation.
 def train_naive_bayes(emotional_words, stop_words):
-    word_counts = {}
-    total_words = {}
-    message_counts = {}
-
+    # Initialization
+    # fmt: off
+    word_counts = {} # Structure: {emotion: {word: count}} Store the count of each word for each emotion.
+    total_words = {} # Structure: {emotion: total_count} Store the total number of words for each emotion.
+    message_counts = {} # Structure: {emotion: message_count} Store the total number of messages for each emotion.
+    #fmt: on
+    # Loop through each emotion and count the occurrences of each word in the training sentences, while also keeping track of the total number of words and messages for each emotion.
     for emotion in EMOTIONS:
         word_counts[emotion] = {}
         total_words[emotion] = 0
@@ -118,34 +144,44 @@ def train_naive_bayes(emotional_words, stop_words):
                 total_words[emotion] += 1
 
     vocabulary_size = len(emotional_words)
-    word_scores = {}
+    # fmt: off
+    word_scores = {} # Structure: {word: {emotion_count, emotion_score}} Store the count and score of each word for each emotion.
+    # fmt: on
 
     for word in emotional_words:
         word_scores[word] = {}
 
         for emotion in EMOTIONS:
-            count = word_counts[emotion].get(word, 0)
+            # fmt: off
+            count = word_counts[emotion].get(word, 0) # Get the count of the word for the emotion, defaulting to 0 if the word is not present in the training data for that emotion.
+            # fmt: on
 
             # Naive Bayes with Laplace smoothing:
-            # P(word | emotion) = (word_count + 1) / (total_words + vocabulary_size)
+            # P(word | emotion) = (Word Count (of a word for a particular emotion) + 1) / (Total Word Count (for that emotion) + Vocabulary Size (number of unique words in the emotional_words table))
             probability = (count + 1) / (total_words[emotion] + vocabulary_size)
 
-            word_scores[word][f"{emotion}_count"] = count + 1
-            word_scores[word][f"{emotion}_score"] = probability
+            word_scores[word][f"{emotion}_count"] = count + 1  # Updating count
+            word_scores[word][f"{emotion}_score"] = probability  # Updating score
 
-    total_messages = sum(message_counts.values())
-    emotion_scores = {}
+    total_messages = sum(
+        message_counts.values()
+    )  # Calculate the total number of messages across all emotions, which is needed to calculate the probability of each emotion based on the training data.
+    # fmt: off
+    emotion_scores = {} # Structure: {emotion: {count, probability}} Store the count and probability of each emotion based on the training data.
+    # fmt: on
 
     for emotion in EMOTIONS:
-        # P(emotion) = messages_for_emotion / total_messages
+        # P(emotion) = Messages For Emotion (each) / Total Messages (for all emotions)
         emotion_scores[emotion] = {
             "count": message_counts[emotion],
             "probability": message_counts[emotion] / total_messages,
         }
-
+    # word_scores → contains probabilities for every word.
+    # emotion_scores → contains overall probabilities for each emotion
     return word_scores, emotion_scores
 
 
+# Fucntion to save the trained data to the database.
 def save_training_to_database(cursor, word_scores, emotion_scores):
     for word, scores in word_scores.items():
         cursor.execute(
@@ -191,6 +227,7 @@ def save_training_to_database(cursor, word_scores, emotion_scores):
         )
 
 
+# Main Fucntion
 def main():
     add_training_data()
 

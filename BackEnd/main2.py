@@ -42,6 +42,7 @@ def keep_emotional_words(text):
     filtered_tokens = [t for t in tokens if t in EMOTIONAL_WORDS]
     return " ".join(filtered_tokens)
 
+
 def get_score_for_word(word, choice):
     valid_choices = {
         "happy",
@@ -84,6 +85,7 @@ def get_score_for_word(word, choice):
     except Exception:
         return 0.0
 
+
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -99,8 +101,10 @@ def perform_actions(cleaned_text):
             emotion_score["fear"] *= get_score_for_word(word, "fear")
             emotion_score["disgust"] *= get_score_for_word(word, "disgust")
             emotion_score["neutral"] *= get_score_for_word(word, "neutral")
-    
-    message_type = max(emotion_score, key=emotion_score.get) if emotion_score else "neutral"
+
+    message_type = (
+        max(emotion_score, key=emotion_score.get) if emotion_score else "neutral"
+    )
     confidence = emotion_score.get(message_type, 0.0) if emotion_score else 0.0
 
     # Return the detected emotion and its score as confidence.
@@ -147,6 +151,7 @@ def load_emotional_words():
 # A variable of set data type to store emotional words.
 EMOTIONAL_WORDS = load_emotional_words()
 
+
 def load_message_emotion_scores():
     # Setup configuration data for connecting to the database using environment variables
     cfg = {
@@ -176,7 +181,6 @@ def load_message_emotion_scores():
             # fallback to cursor.description
             if cur.description:
                 colnames = [c[0] for c in cur.description]
-
         cur.close()
         conn.close()
 

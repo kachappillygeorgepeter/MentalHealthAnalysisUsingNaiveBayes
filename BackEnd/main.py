@@ -1,4 +1,6 @@
 # A simple web framework for building APIs in Python.
+import string
+
 from fastapi import FastAPI
 
 # A library for data validation in Python, used here to define the structure of incoming data.
@@ -60,7 +62,30 @@ def perform_actions(cleaned_text):
 ########################################################################################################################
 
 
-def load_words(isStopWord: int):
+# Fucntion to load environment variables from a .env file.
+def load_env_file(file_name):
+    if not os.path.exists(file_name):  # Check if file exists
+        return
+
+    with open(file_name, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if (
+                not line or line.startswith("#") or "=" not in line
+            ):  # Check if line is empty, a comment, or doesn't contain an '=' character, and skip it if so.
+                continue
+
+            key, value = line.split(
+                "=", 1
+            )  # Split the line into key and value at the first '=' character.
+            os.environ.setdefault(
+                key.strip(), value.strip().strip("'\"")
+            )  # Set the environment variable if it's not already set, stripping whitespace and any surrounding quotes from the value.
+
+
+def load_words(tableName: string):
+    load_env_file(".env")
+    load_env_file("dbDetails.env")
     # Setup configuration data for connecting to the database using environment variables
     cfg = {
         "host": os.getenv("DB_HOST"),
@@ -77,10 +102,7 @@ def load_words(isStopWord: int):
             database=cfg["database"],
         )
         cur = conn.cursor()
-        if isStopWord == 0:
-            cur.execute("SELECT word FROM stop_words")
-        else:
-            cur.execute("SELECT word FROM emotional_words")
+        cur.execute(f"SELECT word FROM {tableName}")
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -93,9 +115,9 @@ def load_words(isStopWord: int):
 
 
 # A variable of set data type to store words.
-# if we pass 1 to load_words function, it will load stop words from the database, otherwise it will load emotional words.
-STOP_WORDS = load_words(1)
-EMOTIONAL_WORDS = load_words(0)
+# if we pass "stop_words" to load_words function, it will load stop words from the database, otherwise it will load emotional words.
+STOP_WORDS = load_words("stop_words")
+EMOTIONAL_WORDS = load_words("emotional_words")
 
 
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
