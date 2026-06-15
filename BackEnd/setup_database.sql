@@ -1,14 +1,16 @@
 -- Mental Health Sentiment Analysis System - Database Setup Script
--- -----------------------------------------------------------------------------------------------------------
 -- Create the database and select it
 CREATE DATABASE IF NOT EXISTS mental_health_db;
+
 USE mental_health_db;
+
 -- -----------------------------------------------------------------------------------------------------------
-Create stop_words table CREATE TABLE IF NOT EXISTS stop_words(
+CREATE TABLE IF NOT EXISTS stop_words(
     id INT AUTO_INCREMENT PRIMARY KEY,
     word VARCHAR(64) NOT NULL UNIQUE,
     INDEX idx_word(word)
 );
+
 INSERT INTO stop_words(word)
 VALUES -- Articles
     ('a'),
@@ -147,7 +149,7 @@ VALUES -- Articles
     ('else') ON DUPLICATE KEY
 UPDATE word =
 VALUES(word);
--- ---------------------------------------------------------------------------------------------------------
+
 -- Creating table for storing emotional words and their Naive Bayes score for being Depressed and Non-Depressed
 CREATE TABLE IF NOT EXISTS emotional_words (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -168,7 +170,7 @@ CREATE TABLE IF NOT EXISTS emotional_words (
     neutral_score DOUBLE NOT NULL DEFAULT 0.001,
     INDEX idx_word(word)
 );
--- ------------------------------------------------------------------------------------------------------------
+
 -- Adding the emotional words
 INSERT INTO emotional_words (word) -- Daily Use Words
 VALUES ('upset'),
@@ -252,7 +254,8 @@ VALUES ('upset'),
     ('pleasant'),
     ('bright'),
     ('uplifted'),
-    ('cheered') -- Gen Z/Internet Slang
+    ('cheered'),
+    -- Gen Z/Internet Slang
     ('ick'),
     ('cringe'),
     ('cringey'),
@@ -262,7 +265,8 @@ VALUES ('upset'),
     ('simping'),
     ('unhinged'),
     ('spiraling'),
-    ('wreckingme') -- High Vocabulary Words
+    ('wreckingme'),
+    -- High Vocabulary Words
     ('anguish'),
     ('desolation'),
     ('forlorn'),
@@ -365,7 +369,8 @@ VALUES ('upset'),
     ('benevolence'),
     ('compunction'),
     ('contrition'),
-    ('reconciliation') -- Clinical/Mental Health Terms
+    ('reconciliation'),
+    -- Clinical/Mental Health Terms
     ('anhedonic'),
     ('dysphoric'),
     ('ruminating'),
@@ -388,7 +393,7 @@ VALUES ('upset'),
     ('avoidance'),
     ('isolation'),
     ('emptiness'),
-    ('desperation') --more words
+    ('desperation'),
     -- Happy / Positive
     ('happy'),
     ('joyful'),
@@ -615,15 +620,16 @@ VALUES ('upset'),
     ('confusion') ON DUPLICATE KEY
 UPDATE word =
 VALUES(word);
-------------------------------------------------------------------------------------------------------------
+
 -- Creating a table for storing probability of a message being one of these emotions.
 CREATE TABLE IF NOT EXISTS message_emotion_probabilities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     emotion VARCHAR(64) NOT NULL UNIQUE,
     probability DOUBLE NOT NULL DEFAULT 0.001,
-    count BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    COUNT BIGINT UNSIGNED NOT NULL DEFAULT 1,
     INDEX idx_emotion(emotion)
 );
+
 INSERT INTO message_emotion_probabilities (emotion)
 VALUES ('happy'),
     ('sad'),
@@ -634,3 +640,10 @@ VALUES ('happy'),
     ('neutral') ON DUPLICATE KEY
 UPDATE emotion =
 VALUES(emotion);
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+SELECT *
+FROM message_emotion_probabilities
