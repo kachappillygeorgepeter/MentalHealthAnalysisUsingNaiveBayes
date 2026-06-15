@@ -10,9 +10,10 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "name": "MentalHealthDB",
-            "database": "MentalHealthDB",
-            "username": "George"
+            "username": "George",
+            "name": "mental_health_db",
+            "database": "mental_health_db"
         }
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
