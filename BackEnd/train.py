@@ -204,7 +204,7 @@ def save_training_to_database(cursor, word_scores, emotion_scores):
         cursor.execute(
             """
             UPDATE message_emotion_probabilities
-            SET probability = %s, count = %s
+            SET probability = %s, `count` = %s
             WHERE emotion = %s
             """,
             (scores["probability"], scores["count"], emotion),
