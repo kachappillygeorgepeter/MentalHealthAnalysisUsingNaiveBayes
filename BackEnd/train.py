@@ -2,38 +2,10 @@ import os
 import re
 
 EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
+TRAINING_DATA_DIR = os.path.join(os.path.dirname(__file__), "TrainingData")
 
-# Add training sentences here. The strings do not need to be cleaned.
-TRAINING_DATA = {
-    "happy": [
-        "I feel happy joyful excited loved and hopeful today",
-        "Life feels bright cheerful peaceful and positive",
-    ],
-    "sad": [
-        "I feel sad lonely hopeless tired and empty",
-        "I am heartbroken rejected abandoned and depressed",
-    ],
-    "confused": [
-        "I feel confused unsure unclear and lost",
-        "My thoughts are scattered foggy doubtful and mixed up",
-    ],
-    "angry": [
-        "I feel angry furious irritated frustrated and bitter",
-        "I am annoyed offended hostile and resentful",
-    ],
-    "fear": [
-        "I feel afraid scared nervous anxious and worried",
-        "I am terrified panicked insecure and vulnerable",
-    ],
-    "disgust": [
-        "I feel disgusted repulsed revolted and sickened",
-        "That was gross nasty offensive vile and unpleasant",
-    ],
-    "neutral": [
-        "I went to the store and completed my work",
-        "The meeting happened today and the report was shared",
-    ],
-}
+# Training sentences are loaded from TrainingData/training_sentences_<emotion>.txt.
+TRAINING_DATA = {emotion: [] for emotion in EMOTIONS}
 
 
 # Function to load environment variables from a .env file.
@@ -108,15 +80,25 @@ def add_training_data():
     if choice == "n":
         return
 
+    total_sentences_added = 0
+
     for emotion in EMOTIONS:
-        print(f"\nEnter training sentences for {emotion}. Press Enter to stop.")
-        while True:
-            sentence = input(f"{emotion}: ").strip()
-            if (
-                not sentence
-            ):  # To break out from a particular emotion input loop, the user can just press Enter without typing anything.
-                break
-            TRAINING_DATA[emotion].append(sentence)
+        file_path = os.path.join(
+            TRAINING_DATA_DIR, f"training_sentences_{emotion}.txt"
+        )
+
+        if not os.path.exists(file_path):
+            print(f"No training file found for {emotion}: {file_path}")
+            continue
+
+        with open(file_path, "r", encoding="utf-8") as file:
+            sentences = [line.strip() for line in file if line.strip()]
+
+        TRAINING_DATA[emotion].extend(sentences)
+        total_sentences_added += len(sentences)
+        print(f"Loaded {len(sentences)} {emotion} training sentences.")
+
+    print(f"Loaded {total_sentences_added} training sentences from TrainingData.")
 
 
 # Function to collect data for training naive bayes model and for db updation.
@@ -174,7 +156,9 @@ def train_naive_bayes(emotional_words, stop_words):
         # P(emotion) = Messages For Emotion (each) / Total Messages (for all emotions)
         emotion_scores[emotion] = {
             "count": message_counts[emotion],
-            "probability": message_counts[emotion] / total_messages,
+            "probability": (
+                message_counts[emotion] / total_messages if total_messages else 0.0
+            ),
         }
     # word_scores → contains probabilities for every word.
     # emotion_scores → contains overall probabilities for each emotion
