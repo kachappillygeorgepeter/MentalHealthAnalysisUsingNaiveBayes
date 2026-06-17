@@ -5,7 +5,7 @@
 const form=document.querySelector(".link-form");
 const sentenceInput=document.querySelector("#analysis-sentence");
 const submitButton=form?.querySelector(".form-button");
-const API_URL="http://localhost:5000/analyze";
+const API_URL="http://localhost:8000/process";
 const resultBox=document.querySelector(".analysis-result");
 // Function is used to display messages in the result box. 
 // It accepts a message and an optional type parameter to indicate the nature of the message (e.g., info, success, error).
@@ -39,7 +39,7 @@ async function analyzeSentence(sentence)
         headers:{
             "Content-Type":"application/json",
         },
-        body:JSON.stringify({ sentence }),
+        body:JSON.stringify({ text: sentence }),
     });
     if (!response.ok) {
         throw new Error("Backend request failed.");
@@ -52,12 +52,12 @@ async function analyzeSentence(sentence)
 // to avoid errors, we defaulty return "Analysis completed." if neither prediction nor message is present in the data.
 function formatAnalysisResult(data) 
 {
-    if (data.prediction && data.confidence!==undefined) {
+    if (data.prediction_message && data.confidence!==undefined) {
         const confidence=Math.round(Number(data.confidence)*100);
-        return `Prediction: ${data.prediction} (${confidence}% confidence)`;
+        return `Prediction: ${data.prediction_message} (${confidence}% confidence)`;
     }
-    else if (data.prediction) {
-        return `Prediction: ${data.prediction}`;
+    else if (data.prediction_message) {
+        return `Prediction: ${data.prediction_message}`;
     }
     else if (data.message) {
         return data.message;

@@ -13,12 +13,12 @@ pip install -r requirements.txt
 
 1. Start MySQL.
 2. Run the SQL commands in `setup_database.sql`.
-3. Update the database credentials in `app.py`.
+3. Update the database credentials in `dbDetails.env`.
 
 ### Run the Application
 
 ```bash
-uvicorn app:app --reload
+uvicorn main:app --reload
 ```
 
 The API will be available at:

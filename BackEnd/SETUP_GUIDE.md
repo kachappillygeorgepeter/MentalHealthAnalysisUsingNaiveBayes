@@ -1,6 +1,7 @@
 # Mental Health Sentiment Analysis System - Backend Setup Guide
 
 ## 📋 Table of Contents
+
 1. [Prerequisites](#prerequisites)
 2. [Installation Steps](#installation-steps)
 3. [Database Setup](#database-setup)
@@ -15,17 +16,19 @@
 
 Before you start, make sure you have:
 
-- **Python 3.8+** installed ([Download Python](https://www.python.org/)) — **Note:** Python 3.13+ requires scikit-learn 1.5.0 or later
+- **Python 3.8+** installed (Download Python)
 - **MySQL Server** installed and running ([Download MySQL](https://dev.mysql.com/downloads/mysql/))
 - **MySQL Workbench** or command-line client (optional but helpful)
 - A terminal/command prompt
 
 To check if Python is installed:
+
 ```bash
 python --version
 ```
 
 To check if MySQL is installed and running:
+
 ```bash
 mysql --version
 ```
@@ -46,10 +49,11 @@ pip install -r requirements.txt
 Or install packages individually:
 
 ```bash
-pip install fastapi uvicorn scikit-learn>=1.5.0 pandas mysql-connector-python pydantic
+pip install fastapi uvicorn python-dotenv mysql-connector-python pydantic
 ```
 
 **What each package does:**
+
 - `fastapi`: Web framework for building the API
 - `uvicorn`: Server to run the FastAPI application
 - `scikit-learn`: Machine learning library for Naive Bayes
@@ -188,12 +192,14 @@ DATABASE_CONFIG = {
 ```
 
 Update with your MySQL credentials:
+
 - `host`: Usually "localhost" unless using remote MySQL
 - `user`: Your MySQL username (default is "root")
 - `password`: Your MySQL password
 - `database`: Should be "mental_health_db"
 
 **Example:**
+
 ```python
 DATABASE_CONFIG = {
     "host": "localhost",
@@ -222,6 +228,7 @@ uvicorn app:app --reload
 ```
 
 **Expected output:**
+
 ```
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 INFO:     Started server process [1234]
@@ -229,6 +236,7 @@ INFO:     Started reloader process [5678]
 ```
 
 You should also see:
+
 ```
 ======================================================================
 Starting Mental Health Sentiment Analysis API...
@@ -248,6 +256,7 @@ Starting Mental Health Sentiment Analysis API...
 ```
 
 The server is now running on:
+
 - **Main API**: `http://localhost:8000`
 - **Interactive API docs (Swagger UI)**: `http://localhost:8000/docs`
 - **Alternative docs (ReDoc)**: `http://localhost:8000/redoc`
@@ -265,7 +274,7 @@ The server is now running on:
 5. Enter a sentence in the text field:
    ```json
    {
-       "sentence": "I feel lonely and hopeless today"
+     "sentence": "I feel lonely and hopeless today"
    }
    ```
 6. Click "Execute"
@@ -274,18 +283,21 @@ The server is now running on:
 ### Option 2: Test with cURL (Command Line)
 
 **Test the root endpoint:**
+
 ```bash
 curl http://localhost:8000/
 ```
 
 Expected response:
+
 ```json
 {
-    "message": "Mental Health Sentiment Analysis API is running"
+  "message": "Mental Health Sentiment Analysis API is running"
 }
 ```
 
 **Test the analyze endpoint:**
+
 ```bash
 curl -X POST http://localhost:8000/analyze \
   -H "Content-Type: application/json" \
@@ -293,13 +305,14 @@ curl -X POST http://localhost:8000/analyze \
 ```
 
 Expected response:
+
 ```json
 {
-    "sentence": "I feel lonely and hopeless today",
-    "filtered_words": ["feel", "lonely", "hopeless"],
-    "depressed_score": 2.65,
-    "normal_score": 0.0,
-    "prediction": "Depressed"
+  "sentence": "I feel lonely and hopeless today",
+  "filtered_words": ["feel", "lonely", "hopeless"],
+  "depressed_score": 2.65,
+  "normal_score": 0.0,
+  "prediction": "Depressed"
 }
 ```
 
@@ -332,6 +345,7 @@ print(f"Response: {response.json()}\n")
 ```
 
 Run it:
+
 ```bash
 python test_api.py
 ```
@@ -343,27 +357,27 @@ Use JavaScript's `fetch` API to test from your HTML/JavaScript:
 ```javascript
 // Test the API
 async function analyzeText() {
-    const sentence = "I feel lonely and hopeless today";
-    
-    try {
-        const response = await fetch('http://localhost:8000/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                sentence: sentence
-            })
-        });
-        
-        const data = await response.json();
-        console.log('Prediction:', data.prediction);
-        console.log('Depressed Score:', data.depressed_score);
-        console.log('Normal Score:', data.normal_score);
-        console.log('Filtered Words:', data.filtered_words);
-    } catch (error) {
-        console.error('Error:', error);
-    }
+  const sentence = "I feel lonely and hopeless today";
+
+  try {
+    const response = await fetch("http://localhost:8000/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sentence: sentence,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Prediction:", data.prediction);
+    console.log("Depressed Score:", data.depressed_score);
+    console.log("Normal Score:", data.normal_score);
+    console.log("Filtered Words:", data.filtered_words);
+  } catch (error) {
+    console.error("Error:", error);
+  }
 }
 
 // Call the function
@@ -377,11 +391,13 @@ analyzeText();
 ### Error: "No module named 'fastapi'"
 
 **Solution:** Install missing dependencies
+
 ```bash
 pip install fastapi uvicorn
 ```
 
 Or use the requirements.txt file:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -389,13 +405,13 @@ pip install -r requirements.txt
 ### Error: "Cannot connect to MySQL"
 
 **Solutions:**
+
 1. Check if MySQL is running
    - On Windows: Start MySQL from Services or Command Prompt
    - On Mac/Linux: Check MySQL status
-   
 2. Verify DATABASE_CONFIG credentials in `app.py`
-   
 3. Make sure the database exists:
+
    ```bash
    mysql -u root -p
    SHOW DATABASES;
@@ -413,6 +429,7 @@ pip install -r requirements.txt
 ### Error: "CORS error in browser"
 
 **This is expected if:**
+
 - You're using a different port than 5500
 - You're using a different domain
 
@@ -442,6 +459,7 @@ Then restart the server.
 ### Error: "ModuleNotFoundError: No module named 'sklearn'"
 
 **Solution:**
+
 ```bash
 pip install scikit-learn
 ```
@@ -449,6 +467,7 @@ pip install scikit-learn
 ### The API is slow or not responding
 
 **Solutions:**
+
 1. Check if MySQL is responding (it might be hung)
 2. Restart MySQL service
 3. Restart the FastAPI server
@@ -497,6 +516,7 @@ MentalHealthAnalysis/
 ## Questions?
 
 If you encounter any issues:
+
 1. Check the error message in the terminal
 2. Review the TROUBLESHOOTING section above
 3. Check the console output when the app starts up

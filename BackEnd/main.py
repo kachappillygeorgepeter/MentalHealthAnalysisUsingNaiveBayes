@@ -1,7 +1,9 @@
 # A simple web framework for building APIs in Python.
-import string
-
+import logging
 from fastapi import FastAPI
+
+# A middleware for handling Cross-Origin Resource Sharing (CORS), which allows the frontend to communicate with the backend.
+from fastapi.middleware.cors import CORSMiddleware
 
 # A library for data validation in Python, used here to define the structure of incoming data.
 from pydantic import BaseModel
@@ -23,9 +25,24 @@ import mysql.connector
 
 # Load environment variables from .env file.
 load_dotenv()
+load_dotenv("dbDetails.env")
 
 # Create an instance of the FastAPI class, This instance will be used to handle requests.
 app = FastAPI()
+
+# Add CORS middleware to allow the frontend to communicate with the backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 
 # Define a Pydantic model to specify the expected structure of the input data for the API endpoint.
@@ -48,12 +65,58 @@ def remove_stop_words(text):
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
-def perform_actions(cleaned_text):
+def analyze_sentiment(cleaned_text):
     tokens = tokenize(cleaned_text)
+    emotions = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
+    scores = {emotion: 1.0 for emotion in emotions}
+
+    # Connect to database to fetch probabilities
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+        )
+        with conn.cursor() as cur:
+            # 1. Load base probabilities P(Emotion)
+            cur.execute(
+                "SELECT emotion, probability FROM message_emotion_probabilities"
+            )
+            for emotion, prob in cur.fetchall():
+                if emotion in scores:
+                    scores[emotion] = float(prob)
+
+            # 2. Update scores based on words P(Word|Emotion)
+            words_to_query = [w for w in tokens if w in EMOTIONAL_WORDS]
+            if words_to_query:
+                # Fetch all unique word scores in one query
+                unique_words = list(set(words_to_query))
+                format_strings = ",".join(["%s"] * len(unique_words))
+                query = f"SELECT word, {', '.join([e + '_score' for e in emotions])} FROM emotional_words WHERE word IN ({format_strings})"
+                cur.execute(query, tuple(unique_words))
+
+                # Map words to their scores
+                word_score_map = {row[0]: row[1:] for row in cur.fetchall()}
+
+                # Multiply scores based on frequency in the original tokens
+                for word in words_to_query:
+                    if word in word_score_map:
+                        for i, emotion in enumerate(emotions):
+                            scores[emotion] *= float(word_score_map[word][i])
+    except Exception as e:
+        print(f"Database error during analysis: {e}")
+    finally:
+        if "conn" in locals() and conn.is_connected():
+            conn.close()
+
+    prediction = max(scores, key=scores.get)
+    total_score = sum(scores.values())
+    confidence = (scores[prediction] / total_score) if total_score > 0 else 0.0
 
     return {
-        "prediction_message": "pending",
-        "confidence": 0.0,
+        "prediction_message": prediction,
+        "confidence": round(confidence, 4),
     }
 
 
@@ -62,30 +125,7 @@ def perform_actions(cleaned_text):
 ########################################################################################################################
 
 
-# Fucntion to load environment variables from a .env file.
-def load_env_file(file_name):
-    if not os.path.exists(file_name):  # Check if file exists
-        return
-
-    with open(file_name, "r", encoding="utf-8") as file:
-        for line in file:
-            line = line.strip()
-            if (
-                not line or line.startswith("#") or "=" not in line
-            ):  # Check if line is empty, a comment, or doesn't contain an '=' character, and skip it if so.
-                continue
-
-            key, value = line.split(
-                "=", 1
-            )  # Split the line into key and value at the first '=' character.
-            os.environ.setdefault(
-                key.strip(), value.strip().strip("'\"")
-            )  # Set the environment variable if it's not already set, stripping whitespace and any surrounding quotes from the value.
-
-
-def load_words(tableName: string):
-    load_env_file(".env")
-    load_env_file("dbDetails.env")
+def load_words(table_name: str):
     # Setup configuration data for connecting to the database using environment variables
     cfg = {
         "host": os.getenv("DB_HOST"),
@@ -101,17 +141,19 @@ def load_words(tableName: string):
             password=cfg["password"],
             database=cfg["database"],
         )
-        cur = conn.cursor()
-        cur.execute(f"SELECT word FROM {tableName}")
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        # We recive the data from sql queiry as a list of tuples. Now we have to convert it to a set.
-        # <if r> ensures tht the tuple is not empty and <r[0]> ensures tht the first element of the tuple (the word) is not empty.
-        return set(r[0].lower().strip() for r in rows if r and r[0])
-    except Exception:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT word FROM {table_name}")
+            rows = cur.fetchall()
+            # We recive the data from sql queiry as a list of tuples. Now we have to convert it to a set.
+            # <if r> ensures tht the tuple is not empty and <r[0]> ensures tht the first element of the tuple (the word) is not empty.
+            return set(r[0].lower().strip() for r in rows if r and r[0])
+    except Exception as e:
         # If the DB isn't available return an empty set.
+        print(f"Error loading words from {table_name}: {e}")
         return set()
+    finally:
+        if "conn" in locals() and conn.is_connected():
+            conn.close()
 
 
 # A variable of set data type to store words.
@@ -123,11 +165,12 @@ EMOTIONAL_WORDS = load_words("emotional_words")
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
 # removes stop words from the input text, performs later actions on the cleaned text,
 # and returns a prediction response.
-@app.post("/process")
-def process(payload: InputText):
+@app.post("/analyze")
+def analyze(payload: InputText):
     cleaned_text = remove_stop_words(payload.text)
-    result = perform_actions(cleaned_text)
+    result = analyze_sentiment(cleaned_text)
     return {
         "prediction_message": result["prediction_message"],
         "confidence": result["confidence"],
+        "filtered_text": cleaned_text,
     }
