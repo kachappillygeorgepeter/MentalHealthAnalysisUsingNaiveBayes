@@ -7,6 +7,12 @@ const bee = document.querySelector(".bee-mascot");
     return;
   }
 
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (prefersReducedMotion.matches) {
+    return;
+  }
+
   const edgePadding = 16;
   let position = { x: 24, y: 120 };
   let start = { ...position };
@@ -97,6 +103,15 @@ const bee = document.querySelector(".bee-mascot");
   }
 
   window.addEventListener("resize", placeBeeOnScreen);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animationFrameId);
+      return;
+    }
+
+    moveStart = performance.now();
+    animationFrameId = requestAnimationFrame(render);
+  });
 
   placeBeeOnScreen();
   chooseTarget();
