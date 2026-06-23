@@ -5,7 +5,7 @@
 const form=document.querySelector(".link-form");
 const sentenceInput=document.querySelector("#analysis-sentence");
 const submitButton=form?.querySelector(".form-button");
-const API_URL="http://localhost:8000/process";
+const API_URL="http://127.0.0.1:8000/process";
 const resultBox=document.querySelector(".analysis-result");
 // Function is used to display messages in the result box. 
 // It accepts a message and an optional type parameter to indicate the nature of the message (e.g., info, success, error).
@@ -42,7 +42,7 @@ async function analyzeSentence(sentence)
         body:JSON.stringify({ text: sentence }),
     });
     if (!response.ok) {
-        throw new Error("Backend request failed.");
+        throw new Error(`Backend request failed with status ${response.status}.`);
     }
     return response.json();
 }
@@ -54,10 +54,10 @@ function formatAnalysisResult(data)
 {
     if (data.prediction_message && data.confidence!==undefined) {
         const confidence=Math.round(Number(data.confidence)*100);
-        return `Prediction: ${data.prediction_message} (${confidence}% confidence)`;
+        return `Predicted Emotion: ${data.prediction_message.charAt(0).toUpperCase() + data.prediction_message.slice(1)} (${confidence}% confidence)`;
     }
     else if (data.prediction_message) {
-        return `Prediction: ${data.prediction_message}`;
+        return `Predicted Emotion: ${data.prediction_message.charAt(0).toUpperCase() + data.prediction_message.slice(1)}`;
     }
     else if (data.message) {
         return data.message;
@@ -84,7 +84,7 @@ form?.addEventListener("submit", async (event) => {
         const data=await analyzeSentence(sentence);
         showResult(formatAnalysisResult(data), "success");
     } catch (error) {
-        showResult("Unable to analyze right now.", "error");
+        showResult("Unable to analyze right now. Start the backend with: python -m uvicorn main3:app --reload", "error");
         console.error(error);
     } finally {
         setLoading(false);
