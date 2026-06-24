@@ -60,12 +60,21 @@ def tokenize(text):
     return re.findall(r"\b\w+\b", text.lower())
 
 
+# A function to filter words
+def remove_stop_words(text):
+    tokens = tokenize(text)
+    filtered_tokens = [t for t in tokens if t not in STOP_WORDS]
+    return " ".join(filtered_tokens)
+
+
+# A function to filter words
 def keep_emotional_words(text):
     tokens = tokenize(text)
     filtered_tokens = [t for t in tokens if t in EMOTIONAL_WORDS]
     return " ".join(filtered_tokens)
 
 
+# A fucntion to establish db connection
 def get_connection():
     cfg = {
         "host": os.getenv("DB_HOST"),
@@ -81,6 +90,7 @@ def get_connection():
     )
 
 
+# A function to load word scores from the database for a given set of words.
 def load_word_scores(words):
     if not words:
         return {}
@@ -100,7 +110,9 @@ def load_word_scores(words):
         conn.close()
 
         return {
-            row[0].lower().strip(): {
+            row[0]
+            .lower()
+            .strip(): {
                 emotion: float(row[index + 1] or 0.0)
                 for index, emotion in enumerate(EMOTIONS)
             }
@@ -110,9 +122,7 @@ def load_word_scores(words):
         return {}
 
 
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
+# A function to perform actions on the cleaned text, calculating emotion scores based on the presence of emotional words and their associated scores.
 def perform_actions(cleaned_text):
     emotion_score = load_message_emotion_scores()
     words = [word for word in cleaned_text.split() if word in EMOTIONAL_WORDS]
@@ -128,9 +138,7 @@ def perform_actions(cleaned_text):
 
     message_type = max(emotion_score, key=emotion_score.get)
     total_score = sum(emotion_score.values())
-    confidence = (
-        emotion_score[message_type] / total_score if total_score > 0 else 0.0
-    )
+    confidence = emotion_score[message_type] / total_score if total_score > 0 else 0.0
 
     # Return the detected emotion and its score as confidence.
     return {
@@ -139,17 +147,15 @@ def perform_actions(cleaned_text):
     }
 
 
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
-
-
-def load_emotional_words():
+def load_words(check: bool):
     try:
         # Create database connection and fetch emotional words from the database, returning them as a set for efficient lookup.
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT word FROM emotional_words")
+        if check:
+            cur.execute("SELECT word FROM emotional_words")
+        else:
+            cur.execute("SELECT word FROM stop_words")
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -162,7 +168,8 @@ def load_emotional_words():
 
 
 # A variable of set data type to store emotional words.
-EMOTIONAL_WORDS = load_emotional_words()
+EMOTIONAL_WORDS = load_words(True)
+STOP_WORDS = load_words(False)
 
 
 def load_message_emotion_scores():
@@ -197,7 +204,8 @@ def root():
 # and returns a prediction response.
 @app.post("/process")
 def process(payload: InputText):
-    cleaned_text = keep_emotional_words(payload.text)
+    text_without_stopwords = remove_stop_words(payload.text)
+    cleaned_text = keep_emotional_words(text_without_stopwords)
     result = perform_actions(cleaned_text)
     return {
         "prediction_message": result["prediction_message"],
