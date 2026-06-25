@@ -84,7 +84,7 @@ form?.addEventListener("submit", async (event) => {
         const data=await analyzeSentence(sentence);
         showResult(formatAnalysisResult(data), "success");
     } catch (error) {
-        showResult("Unable to analyze right now. Start the backend with: python -m uvicorn main3:app --reload", "error");
+        showResult("Unable to analyze right now. Start the backend with: py -m uvicorn main3:app --reload", "error");
         console.error(error);
     } finally {
         setLoading(false);

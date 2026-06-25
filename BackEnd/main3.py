@@ -167,7 +167,7 @@ def load_words(check: bool):
         return set()
 
 
-# A variable of set data type to store emotional words.
+# A variable of set data type to store words.
 EMOTIONAL_WORDS = load_words(True)
 STOP_WORDS = load_words(False)
 
@@ -206,6 +206,12 @@ def root():
 def process(payload: InputText):
     text_without_stopwords = remove_stop_words(payload.text)
     cleaned_text = keep_emotional_words(text_without_stopwords)
+    if not cleaned_text:
+        return {
+            "prediction_message": "Neutral",
+            "confidence": 1.0,
+            "filtered_text": cleaned_text,
+        }
     result = perform_actions(cleaned_text)
     return {
         "prediction_message": result["prediction_message"],
