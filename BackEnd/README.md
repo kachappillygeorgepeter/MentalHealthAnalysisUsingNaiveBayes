@@ -1,189 +1,397 @@
-# Mental Health Sentiment Analysis System
+# Mental Health Analysis System
 
-A FastAPI-based backend application that analyzes text and predicts whether the sentiment indicates a depressed or normal emotional state using a Naive Bayes classifier and a MySQL database.
+A **FastAPI-based Mental Health Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of seven emotions:
 
-## Install Dependencies
+- 😊 Happy
+- 😢 Sad
+- 😕 Confused
+- 😠 Angry
+- 😨 Fear
+- 🤢 Disgust
+- 😐 Neutral
 
-```bash
-cd BackEnd
-pip install -r requirements.txt
-```
+The system stores emotional words and learnt probabilities inside a **MySQL** database and updates them through a training script using custom training datasets.
 
-## Database Setup
+---
 
-1. Start MySQL.
-2. Run the SQL commands in `setup_database.sql`.
-3. Update the database credentials in `dbDetails.env`.
+# Features
 
-### Run the Application
+- Emotion detection using **Naive Bayes Classification**
+- API built with **FastAPI**
+- MySQL database for storing emotional words and probabilities
+- Automatic stop-word removal
+- Emotional word extraction
+- Custom training using text datasets
+- Probability based confidence score
+- Easy to expand by adding new emotional words and training sentences
 
-```bash
-uvicorn main:app --reload
-```
+---
 
-The API will be available at:
+# Technologies Used
 
-```
-http://localhost:8000
-```
+- Python 3.x
+- FastAPI
+- MySQL
+- mysql-connector-python
+- python-dotenv
+- Pydantic
+- RegEx
+- OS
 
-API documentation:
+---
 
-```
-http://localhost:8000/docs
-```
+# How It Works
 
-## Project Structure
+## 1. User sends text
+
+Example
 
 ```text
-BackEnd/
-├── app.py
-├── requirements.txt
-├── SETUP_GUIDE.md
-└── setup_database.sql
+I feel lonely and exhausted today.
 ```
 
-## Features
+---
 
-- REST API built with FastAPI
-- Naive Bayes sentiment classification using Scikit-learn
-- MySQL integration for storing sentiment words and scores
-- Stop-word filtering
-- Automatic API documentation with Swagger UI
-- Input validation using Pydantic
-- CORS support for frontend integration
+## 2. Stop words are removed
 
-## API Endpoints
+Example
 
-### GET /
-
-Checks whether the API is running.
-
-Example:
-
-```bash
-curl http://localhost:8000/
+```text
+lonely exhausted today
 ```
 
-### POST /analyze
+---
 
-Analyzes a sentence and returns sentiment scores and prediction.
+## 3. Emotional words are extracted
 
-Example:
+Only words that exist inside the **emotional_words** table are kept.
 
-```bash
-curl -X POST http://localhost:8000/analyze \
--H "Content-Type: application/json" \
--d '{"sentence":"I feel lonely and hopeless"}'
+Example
+
+```text
+lonely exhausted
 ```
 
-Example Response:
+---
+
+## 4. Naive Bayes Prediction
+
+For every emotional word, the trained probability
+
+```
+P(word | emotion)
+```
+
+is loaded from the database.
+
+The backend multiplies the probabilities together with the prior probability
+
+```
+P(emotion)
+```
+
+and predicts the emotion with the highest score.
+
+---
+
+## 5. API Response
+
+Example
 
 ```json
 {
-  "sentence": "I feel lonely and hopeless",
-  "filtered_words": ["feel", "lonely", "hopeless"],
-  "depressed_score": 2.75,
-  "normal_score": 0.0,
-  "prediction": "Depressed"
+  "prediction_message": "sad",
+  "confidence": 0.94,
+  "filtered_text": "lonely exhausted"
 }
 ```
 
-## How It Works
+---
 
-1. Receive text input from the frontend.
-2. Convert text to lowercase and remove punctuation.
-3. Remove stop words.
-4. Calculate sentiment scores using words stored in the database.
-5. Compare scores and generate a prediction.
-6. Validate results using a Naive Bayes classifier.
+# Database
 
-## Database Tables
+The project uses three tables.
 
-### depressed_words
+## 1. stop_words
 
-| id  | word      | probability_score |
-| --- | --------- | ----------------- |
-| 1   | hopeless  | 0.95              |
-| 2   | lonely    | 0.92              |
-| 3   | worthless | 0.90              |
+Stores common English stop words.
 
-### normal_words
+Example
 
-| id  | word      | probability_score |
-| --- | --------- | ----------------- |
-| 1   | happy     | 0.92              |
-| 2   | excited   | 0.87              |
-| 3   | motivated | 0.85              |
-
-### stop_words
-
-| id  | word |
-| --- | ---- |
-| 1   | the  |
-| 2   | is   |
-| 3   | and  |
-
-## Technologies Used
-
-| Technology             | Purpose            |
-| ---------------------- | ------------------ |
-| FastAPI                | API framework      |
-| Uvicorn                | Application server |
-| MySQL                  | Database           |
-| Scikit-learn           | Machine learning   |
-| Pandas                 | Data processing    |
-| Pydantic               | Data validation    |
-| mysql-connector-python | MySQL connectivity |
-
-## Frontend Integration
-
-Example request from JavaScript:
-
-```javascript
-const response = await fetch("http://localhost:8000/analyze", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    sentence: userInput,
-  }),
-});
-
-const result = await response.json();
-console.log(result);
+```text
+the
+is
+am
+have
+will
+because
 ```
 
-## Troubleshooting
+These are removed before prediction.
 
-### Cannot connect to MySQL
+---
 
-- Verify MySQL is running.
-- Check database credentials.
-- Ensure the database has been created.
+## 2. emotional_words
 
-### No module named 'fastapi'
+Stores every emotional word together with its learned statistics.
+
+Example
+
+| Word   | Happy Score | Sad Score | Angry Score |
+| ------ | ----------- | --------- | ----------- |
+| happy  | 0.42        | 0.01      | 0.01        |
+| lonely | 0.01        | 0.53      | 0.02        |
+
+Each word stores
+
+- Count for every emotion
+- Probability for every emotion
+
+---
+
+## 3. message_emotion_probabilities
+
+Stores
+
+```
+P(emotion)
+```
+
+Example
+
+| Emotion | Probability |
+| ------- | ----------- |
+| Happy   | 0.21        |
+| Sad     | 0.18        |
+| Neutral | 0.25        |
+
+---
+
+# Training the Model
+
+The project does **not** use pre-trained machine learning libraries.
+
+Instead, it trains its own Naive Bayes model.
+
+Training data is stored inside
+
+```text
+TrainingData/
+```
+
+Each emotion has its own text file.
+
+Example
+
+```
+training_sentences_happy.txt
+training_sentences_sad.txt
+training_sentences_angry.txt
+```
+
+Each line represents one training sentence.
+
+Example
+
+```text
+I finally got my dream job.
+```
+
+```text
+Everything feels hopeless.
+```
+
+---
+
+# Training Process
+
+Run
+
+```bash
+python train.py
+```
+
+The script will ask
+
+```text
+Do you want to add training data now? (y/n)
+```
+
+Choosing
+
+```text
+y
+```
+
+loads every training file.
+
+The trainer then
+
+- loads emotional words
+- removes stop words
+- counts word frequency
+- computes Naive Bayes probabilities with Laplace smoothing
+- updates the MySQL database
+
+Finally
+
+```text
+Training completed successfully.
+```
+
+---
+
+# Running the Backend
+
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### CORS errors
+Run FastAPI
 
-Update the allowed origins in the FastAPI CORS configuration and restart the server.
+```bash
+py -m uvicorn main:app --reload
+```
 
-## Learning Objectives
+Server starts at
 
-This project demonstrates:
+```
+http://127.0.0.1:8000
+```
 
-- FastAPI backend development
-- REST API design
-- MySQL integration with Python
-- Text preprocessing
-- Naive Bayes sentiment classification
-- Frontend-to-backend communication
+Swagger documentation
 
-## License
+```
+http://127.0.0.1:8000/docs
+```
 
-This project is intended for educational and learning purposes.
+---
+
+# API Endpoint
+
+## POST `/process`
+
+### Request
+
+```json
+{
+  "text": "I feel extremely anxious and scared."
+}
+```
+
+---
+
+### Response
+
+```json
+{
+  "prediction_message": "fear",
+  "confidence": 0.962,
+  "filtered_text": "anxious scared"
+}
+```
+
+---
+
+# Environment Variables
+
+Create a `.env` (or `dbDetails.env`) file.
+
+Example
+
+```env
+DB_HOST=xxx
+DB_USER=xxx
+DB_PASSWORD=xxx
+DB_NAME=xxx
+```
+
+---
+
+# Setting Up the Database
+
+Execute
+
+```bash
+setup_db.sql
+```
+
+This script automatically creates
+
+- `mental_health_db`
+- `stop_words`
+- `emotional_words`
+- `message_emotion_probabilities`
+
+and inserts the default emotional vocabulary.
+
+---
+
+# Adding New Emotional Words
+
+Simply add new words into
+
+```sql
+INSERT INTO emotional_words(word)
+VALUES (...);
+```
+
+After adding new words, retrain the model.
+
+```bash
+python train.py
+```
+
+This updates all probabilities in the database.
+
+---
+
+# Naive Bayes Formula
+
+Word likelihood
+
+```
+P(word | emotion)
+=
+(word_count + 1)
+/
+(total_words + vocabulary_size)
+```
+
+The project uses **Laplace Smoothing** to avoid zero probabilities.
+
+Emotion prior
+
+```
+P(emotion)
+=
+messages_for_emotion
+/
+total_messages
+```
+
+Prediction score
+
+```
+P(emotion)
+×
+Π P(word | emotion)
+```
+
+The emotion with the highest score is returned.
+
+---
+
+# Future Improvements
+
+- Lemmatization and stemming
+- Negation handling (e.g., "not happy")
+- Emoji sentiment detection
+- Multi-label emotion prediction
+- Confidence calibration
+- Larger emotional vocabulary
+- Improved preprocessing using NLP libraries
+
+---
