@@ -95,3 +95,11 @@
     transition-duration: 0.01ms;
   }
 }
+
+@media (max-width: 775px), (prefers-reduced-motion: reduce) {
+  .bee-mascot {
+    --bee-x: 16px;
+    --bee-y: 16px;
+    will-change: auto;
+  }
+}

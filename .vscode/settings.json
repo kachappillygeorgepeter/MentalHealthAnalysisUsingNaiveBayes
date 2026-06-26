@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "username": "George",
+            "name": "mental_health_db",
+            "database": "mental_health_db"
+        }
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
