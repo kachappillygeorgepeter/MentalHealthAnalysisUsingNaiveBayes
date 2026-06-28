@@ -48,6 +48,34 @@ app.add_middleware(
 
 EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
 
+NEGATION_WORDS = {
+    "not",
+    "no",
+    "never",
+    "don't",
+    "dont",
+    "doesn't",
+    "doesnt",
+    "didn't",
+    "isn't",
+    "aren't",
+    "wasn't",
+    "weren't",
+    "can't",
+    "couldn't",
+    "won't",
+    "without",
+}
+
+OPPOSITE_EMOTION = {
+    "happy": "sad",
+    "sad": "neutral",
+    "angry": "neutral",
+    "fear": "neutral",
+    "confused": "neutral",
+    "disgust": "neutral",
+}
+
 
 # Define a Pydantic model to specify the expected structure of the input data for the API endpoint.
 # Pydantic is a python library for data validation and tht kinda stuffs.
@@ -63,14 +91,14 @@ def tokenize(text):
 # A function to filter words
 def remove_stop_words(text):
     tokens = tokenize(text)
-    filtered_tokens = [t for t in tokens if t not in STOP_WORDS]
+    filtered_tokens = [t for t in tokens if t not in STOP_WORDS or t in NEGATION_WORDS]
     return " ".join(filtered_tokens)
 
 
 # A function to filter words
 def keep_emotional_words(text):
     tokens = tokenize(text)
-    filtered_tokens = [t for t in tokens if t in EMOTIONAL_WORDS]
+    filtered_tokens = [t for t in tokens if t in EMOTIONAL_WORDS or t in NEGATION_WORDS]
     return " ".join(filtered_tokens)
 
 
@@ -125,22 +153,31 @@ def load_word_scores(words):
 # A function to perform actions on the cleaned text, calculating emotion scores based on the presence of emotional words and their associated scores.
 def perform_actions(cleaned_text):
     emotion_score = load_message_emotion_scores()
-    words = [word for word in cleaned_text.split() if word in EMOTIONAL_WORDS]
-    word_score_map = load_word_scores(set(words))
+    words = cleaned_text.split()
+    word_score_map = load_word_scores(set(w for w in words if w in EMOTIONAL_WORDS))
+    negate = False
 
     for word in words:
+        if word in NEGATION_WORDS:
+            negate = True
+            continue
+
         scores = word_score_map.get(word)
         if not scores:
             continue
 
-        for emotion in EMOTIONS:
-            emotion_score[emotion] *= scores[emotion]
+        if negate:
+            dominant = max(scores, key=scores.get)
+            opposite = OPPOSITE_EMOTION.get(dominant, dominant)
+            emotion_score[opposite] *= scores[dominant]
+            negate = False
+        else:
+            for emotion in EMOTIONS:
+                emotion_score[emotion] *= scores[emotion]
 
     message_type = max(emotion_score, key=emotion_score.get)
     total_score = sum(emotion_score.values())
     confidence = emotion_score[message_type] / total_score if total_score > 0 else 0.0
-
-    # Return the detected emotion and its score as confidence.
     return {
         "prediction_message": message_type,
         "confidence": round(confidence, 4),

@@ -87,6 +87,8 @@ I feel lonely eating by myself.
 I miss going home after school.
 I feel sad about the empty seat.
 I wish I had handled it better.
+i feel very down.
+i feel very sad.
 I feel disappointed that nobody listened.
 I miss our late night talks.
 I feel hurt when I'm not invited.
@@ -126,6 +128,7 @@ I regret canceling those plans.
 I feel alone in the classroom.
 I miss our old family house.
 I feel sad about the missed opportunity.
+i am very sad.
 I wish someone understood how I feel.
 I feel disappointed by the broken laptop.
 I miss the way things were.
@@ -562,3 +565,4 @@ The empty bench in the park brought back old memories.
 I felt sorrow every time I looked at that photograph.
 The painful memories slowly returned as I opened the old box.
 I ended the day feeling lonely, exhausted, and quietly hopeful for better days.
+i am sad.
