@@ -48,6 +48,7 @@ app.add_middleware(
 
 EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
 
+# To handle negation in text, we define a set of negation words that can invert the meaning of emotional words in the text.
 NEGATION_WORDS = {
     "not",
     "no",
@@ -57,16 +58,25 @@ NEGATION_WORDS = {
     "doesn't",
     "doesnt",
     "didn't",
+    "didnt",
     "isn't",
+    "isnt",
     "aren't",
+    "arent",
     "wasn't",
+    "wasnt",
     "weren't",
+    "werent",
     "can't",
+    "cant",
     "couldn't",
+    "couldnt",
     "won't",
+    "wont",
     "without",
 }
 
+# To map each emotion to its opposite for negation handling.
 OPPOSITE_EMOTION = {
     "happy": "sad",
     "sad": "neutral",
@@ -150,7 +160,7 @@ def load_word_scores(words):
         return {}
 
 
-# A function to perform actions on the cleaned text, calculating emotion scores based on the presence of emotional words and their associated scores.
+# A function to perform actions on the cleaned text, checking negation, calculating emotion scores based on the presence of emotional words and their associated scores.
 def perform_actions(cleaned_text):
     emotion_score = load_message_emotion_scores()
     words = cleaned_text.split()
@@ -169,7 +179,13 @@ def perform_actions(cleaned_text):
         if negate:
             dominant = max(scores, key=scores.get)
             opposite = OPPOSITE_EMOTION.get(dominant, dominant)
-            emotion_score[opposite] *= scores[dominant]
+            for emotion in EMOTIONS:
+                if emotion == opposite:
+                    emotion_score[emotion] *= scores[
+                        dominant
+                    ]  # Make the necessary emotion dominant
+                else:
+                    emotion_score[emotion] *= 0.0001  # Reduce the others to negligible
             negate = False
         else:
             for emotion in EMOTIONS:
