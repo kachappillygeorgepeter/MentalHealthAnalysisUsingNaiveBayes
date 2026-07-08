@@ -268,11 +268,3 @@ def process(payload: InputText):
         "confidence": result["confidence"],
         "filtered_text": cleaned_text,
     }
-
-
-@app.get("/debug")
-def debug():
-    return {
-        "emotional_words_count": len(EMOTIONAL_WORDS),
-        "stop_words_count": len(STOP_WORDS),
-    }
