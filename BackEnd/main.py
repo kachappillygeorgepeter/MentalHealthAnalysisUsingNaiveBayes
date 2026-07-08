@@ -152,8 +152,9 @@ def load_word_scores(words):
             }
             for row in rows
         }
-    except Exception:
-        return {}
+    except Exception as e:
+        print("DATABASE ERROR:", str(e))
+        raise
 
 
 # A function to perform actions on the cleaned text, checking negation, calculating emotion scores based on the presence of emotional words and their associated scores.
