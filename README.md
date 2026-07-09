@@ -1,6 +1,6 @@
-# Mental Health Analysis System
+# Sentiment Analysis System
 
-A **FastAPI-based Mental Health Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of seven emotions:
+A **FastAPI-based Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of seven emotions:
 
 - 😊 Happy
 - 😢 Sad
