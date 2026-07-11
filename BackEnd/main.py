@@ -269,6 +269,32 @@ EMOTIONAL_WORDS = load_words(True)
 STOP_WORDS = load_words(False)
 
 
+def classifier_status():
+    return {
+        "ready": bool(EMOTIONAL_WORDS),
+        "emotional_words_count": len(EMOTIONAL_WORDS),
+        "stop_words_count": len(STOP_WORDS),
+    }
+
+
+def ensure_classifier_ready():
+    if EMOTIONAL_WORDS:
+        return
+
+    logger.error(
+        "Classifier is not ready because emotional_words loaded as empty. "
+        "Check DB_NAME and confirm the emotional_words table exists."
+    )
+    raise HTTPException(
+        status_code=503,
+        detail={
+            "message": "Classifier is not ready because emotional_words did not load from the database.",
+            "likely_fix": "Check DB_NAME and confirm the emotional_words table exists in that database.",
+            **classifier_status(),
+        },
+    )
+
+
 def load_message_emotion_scores():
     conn = None
     cur = None
@@ -310,12 +336,22 @@ def root():
     return {"message": "Mental Health Analysis API is running"}
 
 
+@app.get("/health")
+def health():
+    status = classifier_status()
+    return {
+        "api": "running",
+        "classifier": status,
+    }
+
+
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
 # keeps emotional words from the input text, performs later actions on the cleaned text,
 # and returns a prediction response.
 @app.post("/process")
 def process(payload: InputText):
     try:
+        ensure_classifier_ready()
         text_without_stopwords = remove_stop_words(payload.text)
         cleaned_text = keep_emotional_words(text_without_stopwords)
         if not cleaned_text:
@@ -330,6 +366,8 @@ def process(payload: InputText):
             "confidence": result["confidence"],
             "filtered_text": cleaned_text,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.exception("Failed to process request text.")
         raise HTTPException(
