@@ -1,5 +1,5 @@
 # A simple web framework for building APIs in Python.
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 # A middleware for handling Cross-Origin Resource Sharing (CORS), which allows the frontend to communicate with the backend.
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +15,7 @@ import re
 
 # A library for working with environment variables, used here to read database credentials.
 import os
+import logging
 
 # A library for loading environment variables from .env files.
 from dotenv import load_dotenv
@@ -27,6 +28,12 @@ load_dotenv()
 load_dotenv("dbDetails.env")
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 load_dotenv(os.path.join(os.path.dirname(__file__), "dbDetails.env"))
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 # Create an instance of the FastAPI class, This instance will be used to handle requests.
 app = FastAPI()
@@ -108,13 +115,26 @@ def keep_emotional_words(text):
 
 # A fucntion to establish db connection
 def get_connection():
+    port_value = os.getenv("DB_PORT")
+    try:
+        port = int(port_value) if port_value else None
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid DB_PORT value: {port_value!r}. It must be a number."
+        ) from exc
+
     cfg = {
         "host": os.getenv("DB_HOST"),
         "user": os.getenv("DB_USER"),
         "password": os.getenv("DB_PASSWORD"),
         "database": os.getenv("DB_NAME"),
-        "port": int(os.getenv("DB_PORT")) if os.getenv("DB_PORT") else None,
+        "port": port,
     }
+    missing = [key for key in ("host", "user", "database") if not cfg[key]]
+    if missing:
+        env_names = ", ".join(f"DB_{key.upper()}" for key in missing)
+        raise RuntimeError(f"Missing required database environment variables: {env_names}")
+
     return mysql.connector.connect(
         host=cfg["host"],
         user=cfg["user"],
@@ -131,6 +151,8 @@ def load_word_scores(words):
 
     columns = ", ".join(f"{emotion}_score" for emotion in EMOTIONS)
     placeholders = ", ".join(["%s"] * len(words))
+    conn = None
+    cur = None
 
     try:
         conn = get_connection()
@@ -140,8 +162,6 @@ def load_word_scores(words):
             tuple(words),
         )
         rows = cur.fetchall()
-        cur.close()
-        conn.close()
 
         return {
             row[0]
@@ -152,9 +172,20 @@ def load_word_scores(words):
             }
             for row in rows
         }
+    except mysql.connector.Error as e:
+        logger.exception(
+            "Failed to load word scores for %d words from the emotional_words table.",
+            len(words),
+        )
+        raise RuntimeError(f"Database error while loading word scores: {e}") from e
     except Exception as e:
-        print("DATABASE ERROR:", str(e))
+        logger.exception("Unexpected error while loading word scores.")
         raise
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 # A function to perform actions on the cleaned text, checking negation, calculating emotion scores based on the presence of emotional words and their associated scores.
@@ -198,6 +229,10 @@ def perform_actions(cleaned_text):
 
 
 def load_words(check: bool):
+    table_name = "emotional_words" if check else "stop_words"
+    conn = None
+    cur = None
+
     try:
         # Create database connection and fetch emotional words from the database, returning them as a set for efficient lookup.
         conn = get_connection()
@@ -207,14 +242,26 @@ def load_words(check: bool):
         else:
             cur.execute("SELECT word FROM stop_words")
         rows = cur.fetchall()
-        cur.close()
-        conn.close()
         # We recive the data from sql queiry as a list of tuples. Now we have to convert it to a set.
         # <if r> ensures tht the tuple is not empty and <r[0]> ensures tht the first element of the tuple (the word) is not empty.
         return set(r[0].lower().strip() for r in rows if r and r[0])
+    except mysql.connector.Error:
+        logger.exception(
+            "Failed to load %s from the database. Returning an empty set.",
+            table_name,
+        )
+        return set()
     except Exception:
         # If the DB isn't available return an empty set.
+        logger.exception(
+            "Unexpected error while loading %s. Returning an empty set.", table_name
+        )
         return set()
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 # A variable of set data type to store words.
@@ -223,14 +270,15 @@ STOP_WORDS = load_words(False)
 
 
 def load_message_emotion_scores():
+    conn = None
+    cur = None
+
     try:
         # Load base emotion probabilities as P(emotion).
         conn = get_connection()
         cur = conn.cursor()
         cur.execute("SELECT emotion, probability FROM message_emotion_probabilities")
         rows = cur.fetchall()
-        cur.close()
-        conn.close()
 
         result = {emotion: 1.0 for emotion in EMOTIONS}
         for emotion, probability in rows:
@@ -239,9 +287,22 @@ def load_message_emotion_scores():
                 result[emotion_key] = float(probability or 0.0)
 
         return result
-    except Exception:
+    except mysql.connector.Error:
         # If the DB isn't available, keep the endpoint responsive with neutral priors.
+        logger.exception(
+            "Failed to load message emotion probabilities. Using neutral priors."
+        )
         return {emotion: 1.0 for emotion in EMOTIONS}
+    except Exception:
+        logger.exception(
+            "Unexpected error while loading message emotion probabilities. Using neutral priors."
+        )
+        return {emotion: 1.0 for emotion in EMOTIONS}
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 
 @app.get("/")
@@ -254,17 +315,28 @@ def root():
 # and returns a prediction response.
 @app.post("/process")
 def process(payload: InputText):
-    text_without_stopwords = remove_stop_words(payload.text)
-    cleaned_text = keep_emotional_words(text_without_stopwords)
-    if not cleaned_text:
+    try:
+        text_without_stopwords = remove_stop_words(payload.text)
+        cleaned_text = keep_emotional_words(text_without_stopwords)
+        if not cleaned_text:
+            return {
+                "prediction_message": "Neutral",
+                "confidence": 1.0,
+                "filtered_text": cleaned_text,
+            }
+        result = perform_actions(cleaned_text)
         return {
-            "prediction_message": "Neutral",
-            "confidence": 1.0,
+            "prediction_message": result["prediction_message"],
+            "confidence": result["confidence"],
             "filtered_text": cleaned_text,
         }
-    result = perform_actions(cleaned_text)
-    return {
-        "prediction_message": result["prediction_message"],
-        "confidence": result["confidence"],
-        "filtered_text": cleaned_text,
-    }
+    except Exception as e:
+        logger.exception("Failed to process request text.")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Failed to process the text. Check the backend logs for the full traceback.",
+                "error_type": type(e).__name__,
+                "error": str(e),
+            },
+        ) from e
