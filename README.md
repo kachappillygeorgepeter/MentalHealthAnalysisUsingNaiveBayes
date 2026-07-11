@@ -1,6 +1,6 @@
 # Sentiment Analysis System
 
-A **FastAPI-based Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of seven emotions:
+A **FastAPI-based Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of nine emotions:
 
 - 😊 Happy
 - 😢 Sad
@@ -9,6 +9,9 @@ A **FastAPI-based Sentiment Analysis API** that uses a **Naive Bayes** classifie
 - 😨 Fear
 - 🤢 Disgust
 - 😐 Neutral
+- 😟 Anxiety
+- ☠️ Suicidal
+- 😔 Depressed
 
 The system stores emotional words and learnt probabilities inside a **MySQL** database and updates them through a training script using custom training datasets.
 
@@ -24,6 +27,7 @@ The system stores emotional words and learnt probabilities inside a **MySQL** da
 - Custom training using text datasets
 - Probability based confidence score
 - Easy to expand by adding new emotional words and training sentences
+- Normalized single-line training records for more stable parsing and training
 
 ---
 
@@ -187,9 +191,14 @@ Example
 training_sentences_happy.txt
 training_sentences_sad.txt
 training_sentences_angry.txt
+training_sentences_anxiety.txt
+training_sentences_suicidal.txt
+training_sentences_depressed.txt
 ```
 
-Each line represents one training sentence.
+Each record is stored as a single line to keep the training data structure consistent and easier for the training script to process.
+
+Example
 
 Example
 

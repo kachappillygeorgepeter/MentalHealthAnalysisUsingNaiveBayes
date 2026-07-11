@@ -1,7 +1,20 @@
 import os
 import re
 
-EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
+# These names must match the <emotion>_count and <emotion>_score columns in
+# emotional_words, as well as the values in message_emotion_probabilities.
+EMOTIONS = [
+    "happy",
+    "sad",
+    "confused",
+    "angry",
+    "fear",
+    "disgust",
+    "anxiety",
+    "suicidal",
+    "depressed",
+    "neutral",
+]
 TRAINING_DATA_DIR = os.path.join(os.path.dirname(__file__), "TrainingData")
 
 # Training sentences are loaded from TrainingData/training_sentences_<emotion>.txt.
@@ -92,9 +105,7 @@ def add_training_data():
     total_sentences_added = 0
 
     for emotion in EMOTIONS:
-        file_path = os.path.join(
-            TRAINING_DATA_DIR, f"training_sentences_{emotion}.txt"
-        )
+        file_path = os.path.join(TRAINING_DATA_DIR, f"training_sentences_{emotion}.txt")
 
         if not os.path.exists(file_path):
             print(f"No training file found for {emotion}: {file_path}")
@@ -176,38 +187,21 @@ def train_naive_bayes(emotional_words, stop_words):
 
 # Fucntion to save the trained data to the database.
 def save_training_to_database(cursor, word_scores, emotion_scores):
-    for word, scores in word_scores.items():
-        cursor.execute(
-            """
+    score_assignments = ",\n                ".join(
+        f"{emotion}_count = %s, {emotion}_score = %s" for emotion in EMOTIONS
+    )
+    update_query = f"""
             UPDATE emotional_words
             SET
-                happy_count = %s, happy_score = %s,
-                sad_count = %s, sad_score = %s,
-                confused_count = %s, confused_score = %s,
-                angry_count = %s, angry_score = %s,
-                fear_count = %s, fear_score = %s,
-                disgust_count = %s, disgust_score = %s,
-                neutral_count = %s, neutral_score = %s
+                {score_assignments}
             WHERE word = %s
-            """,
-            (
-                scores["happy_count"],
-                scores["happy_score"],
-                scores["sad_count"],
-                scores["sad_score"],
-                scores["confused_count"],
-                scores["confused_score"],
-                scores["angry_count"],
-                scores["angry_score"],
-                scores["fear_count"],
-                scores["fear_score"],
-                scores["disgust_count"],
-                scores["disgust_score"],
-                scores["neutral_count"],
-                scores["neutral_score"],
-                word,
-            ),
-        )
+            """
+
+    for word, scores in word_scores.items():
+        values = []
+        for emotion in EMOTIONS:
+            values.extend((scores[f"{emotion}_count"], scores[f"{emotion}_score"]))
+        cursor.execute(update_query, (*values, word))
 
     for emotion, scores in emotion_scores.items():
         cursor.execute(

@@ -47,7 +47,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-EMOTIONS = ["happy", "sad", "confused", "angry", "fear", "disgust", "neutral"]
+# These names must match the <emotion>_score columns in emotional_words and
+# the emotion values in message_emotion_probabilities.
+EMOTIONS = [
+    "happy",
+    "sad",
+    "confused",
+    "angry",
+    "fear",
+    "disgust",
+    "anxiety",
+    "suicidal",
+    "depressed",
+    "neutral",
+]
 
 # To handle negation in text, we define a set of negation words that can invert the meaning of emotional words in the text.
 NEGATION_WORDS = {
@@ -85,6 +98,9 @@ OPPOSITE_EMOTION = {
     "fear": "neutral",
     "confused": "neutral",
     "disgust": "neutral",
+    "anxiety": "neutral",
+    "suicidal": "neutral",
+    "depressed": "neutral",
 }
 
 
@@ -133,7 +149,9 @@ def get_connection():
     missing = [key for key in ("host", "user", "database") if not cfg[key]]
     if missing:
         env_names = ", ".join(f"DB_{key.upper()}" for key in missing)
-        raise RuntimeError(f"Missing required database environment variables: {env_names}")
+        raise RuntimeError(
+            f"Missing required database environment variables: {env_names}"
+        )
 
     return mysql.connector.connect(
         host=cfg["host"],
