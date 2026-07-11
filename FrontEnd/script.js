@@ -42,7 +42,9 @@ async function analyzeSentence(sentence)
         body:JSON.stringify({ text: sentence }),
     });
     if (!response.ok) {
-        throw new Error(`Backend request failed with status ${response.status}.`);
+        const errorData=await response.json().catch(() => null);
+        const detail=errorData?.detail?.message || errorData?.detail || response.statusText;
+        throw new Error(`Backend request failed with status ${response.status}: ${detail}`);
     }
     return response.json();
 }
@@ -84,7 +86,7 @@ form?.addEventListener("submit", async (event) => {
         const data=await analyzeSentence(sentence);
         showResult(formatAnalysisResult(data), "success");
     } catch (error) {
-        showResult("Unable to analyze right now. Start the backend with: py -m uvicorn main3:app --reload", "error");
+        showResult("Unable to analyze right now. Start the backend with: py -m uvicorn main:app --reload, then check /health.", "error");
         console.error(error);
     } finally {
         setLoading(false);

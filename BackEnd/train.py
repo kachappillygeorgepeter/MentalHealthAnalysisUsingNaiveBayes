@@ -41,11 +41,20 @@ def get_connection():
     load_env_file(os.path.join(os.path.dirname(__file__), ".env"))
     load_env_file(os.path.join(os.path.dirname(__file__), "dbDetails.env"))
 
+    port_value = os.getenv("DB_PORT")
+    try:
+        port = int(port_value) if port_value else None
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid DB_PORT value: {port_value!r}. It must be a number."
+        ) from exc
+
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME"),
+        port=port,
     )
 
 
