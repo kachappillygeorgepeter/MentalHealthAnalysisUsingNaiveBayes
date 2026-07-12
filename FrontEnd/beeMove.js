@@ -102,6 +102,27 @@ const bee = document.querySelector(".bee-mascot");
     bee.style.setProperty("--bee-y", `${position.y}px`);
   }
 
+  function chooseDashTarget() {
+    const bounds = getBounds();
+    start = { ...position };
+    const angle = randomBetween(0, Math.PI * 2);
+    const distance = randomBetween(180, 340);
+    target = clampToScreen({
+      x: start.x + Math.cos(angle) * distance,
+      y: start.y + Math.sin(angle) * distance,
+    });
+    moveDuration = 500;
+    moveStart = performance.now();
+    pauseUntil = 0;
+    const direction = target.x >= start.x ? -1 : 1;
+    lastFaceDirection = direction;
+    bee.style.setProperty("--bee-face", direction);
+  }
+
+  bee.addEventListener("pointerdown", () => {
+    chooseDashTarget();
+  });
+
   window.addEventListener("resize", placeBeeOnScreen);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
