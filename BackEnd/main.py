@@ -23,11 +23,16 @@ from dotenv import load_dotenv
 # A library for connecting to MySQL databases in Python.
 import mysql.connector
 
+# Google Generative AI SDK - used for the chatbot NLP fallback when no emotional words are detected.
+import google.generativeai as genai
+
 # Load environment variables from .env file.
 load_dotenv()
 load_dotenv("dbDetails.env")
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 load_dotenv(os.path.join(os.path.dirname(__file__), "dbDetails.env"))
+# Load API credentials for the chatbot fallback.
+load_dotenv(os.path.join(os.path.dirname(__file__), "apiDetails.env"))
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
@@ -103,6 +108,56 @@ OPPOSITE_EMOTION = {
     "depressed": "neutral",
 }
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Chatbot NLP Fallback
+# ─────────────────────────────────────────────────────────────────────────────
+
+def get_chatbot_response(user_text: str) -> str:
+    """
+    Called when no emotional words are detected in the user's input.
+    Sends the original text to Google Gemini for a natural-language
+    mental-health-aware reply, instead of simply returning 'Neutral'.
+
+    Returns the chatbot reply string, or a safe fallback message if the
+    API key is missing or the call fails.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "your_gemini_api_key_here":
+        logger.warning(
+            "GEMINI_API_KEY is not configured in apiDetails.env. "
+            "Returning neutral fallback without chatbot response."
+        )
+        return None  # Caller will handle the missing-key case gracefully.
+
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(model_name)
+
+        system_prompt = (
+            "You are a compassionate mental-health support assistant. "
+            "The user's message does not contain clearly emotional language, "
+            "but they may still need support or information. "
+            "Respond in a warm, empathetic, and helpful way. "
+            "Keep your response concise (2-4 sentences). "
+            "Do NOT diagnose, prescribe, or replace professional help."
+        )
+
+        response = model.generate_content(f"{system_prompt}\n\nUser: {user_text}")
+        return response.text.strip()
+
+    except Exception:
+        logger.exception(
+            "Chatbot API call failed for text: %r. Returning None so the "
+            "caller falls back to a neutral response.",
+            user_text[:80],
+        )
+        return None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 
 # Define a Pydantic model to specify the expected structure of the input data for the API endpoint.
 # Pydantic is a python library for data validation and tht kinda stuffs.
@@ -366,18 +421,41 @@ def health():
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
 # keeps emotional words from the input text, performs later actions on the cleaned text,
 # and returns a prediction response.
+# If no emotional words are found, the original text is sent to a Gemini chatbot
+# for a natural-language NLP reply instead of returning a plain "Neutral".
 @app.post("/process")
 def process(payload: InputText):
     try:
         ensure_classifier_ready()
         text_without_stopwords = remove_stop_words(payload.text)
         cleaned_text = keep_emotional_words(text_without_stopwords)
+
         if not cleaned_text:
-            return {
+            # No emotional words were detected — delegate to the Gemini chatbot
+            # for a more meaningful, context-aware natural language response.
+            chatbot_reply = get_chatbot_response(payload.text)
+
+            response = {
                 "prediction_message": "Neutral",
                 "confidence": 1.0,
                 "filtered_text": cleaned_text,
             }
+
+            if chatbot_reply:
+                # Chatbot responded successfully — include its reply.
+                response["chatbot_response"] = chatbot_reply
+                response["chatbot_used"] = True
+            else:
+                # API key not set or call failed — inform the client gracefully.
+                response["chatbot_response"] = (
+                    "No strong emotional signals were detected in your message. "
+                    "If you'd like more personalised support, please configure "
+                    "the GEMINI_API_KEY in apiDetails.env."
+                )
+                response["chatbot_used"] = False
+
+            return response
+
         result = perform_actions(cleaned_text)
         return {
             "prediction_message": result["prediction_message"],

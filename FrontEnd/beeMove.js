@@ -1,5 +1,5 @@
 (function () {
- /*THIS FILE NEEDES TO BE STUDIED AND IS MADE FOR FUN
+ /*THIS FILE NEEDES TO BE STUDIED AND IS MADE FOR FUN ---VIBE CODEed---
  */ 
 const bee = document.querySelector(".bee-mascot");
 
