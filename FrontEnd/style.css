@@ -86,13 +86,15 @@ textarea {
 }
 
 h1,
-h2 {
+h2,
+h3 {
     text-wrap: balance;
-    transition: color 0.25s ease;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 h1:hover,
-h2:hover {
+h2:hover,
+h3:hover {
     color: var(--color-yellow-primary);
 }
 
@@ -105,11 +107,21 @@ h2:hover {
     border: 0.1rem solid transparent;
     border-radius: 999rem;
     font-weight: 700;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn:hover {
     transform: translateY(-0.3rem);
+}
+
+.btn:active {
+    transform: translateY(-0.1rem) scale(0.97);
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 0.4rem var(--overlay-yellow-muted);
 }
 
 .btn-primary {
@@ -198,13 +210,18 @@ h2:hover {
     min-height: 3.8rem;
     padding: 0.8rem 1.6rem;
     border-radius: 999rem;
-    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-links a:hover {
     color: var(--color-black-primary);
     background: var(--color-yellow-primary);
     box-shadow: 0 0.8rem 2rem var(--shadow-yellow-soft);
+    transform: translateY(-0.1rem);
+}
+
+.nav-links a:active {
+    transform: translateY(0) scale(0.97);
 }
 
 /* -------------------- Hero Section -------------------- */
@@ -216,18 +233,21 @@ h2:hover {
 }
 
 .hero-grid {
-    width: 72%;
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 4rem;
+    align-items: center;
 }
 
 .hero-content h1 {
     color: var(--color-black-primary);
     font-size: 5.8rem;
     line-height: 1.08;
-    max-width: 12ch;
+    max-width: 15ch;
 }
 
 .hero-text {
-    width: 84%;
+    width: 90%;
     margin-top: 2.4rem;
     color: var(--color-black-secondary);
     font-size: 1.9rem;
@@ -237,6 +257,66 @@ h2:hover {
     display: flex;
     gap: 1.6rem;
     margin-top: 3.6rem;
+}
+
+/* -------------------- Hero Graphic SVG -------------------- */
+.hero-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-svg {
+    width: 100%;
+    max-width: 32rem;
+    height: auto;
+}
+
+.honey-cell {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.hero-svg:hover .honey-cell {
+    opacity: 0.6;
+}
+
+.cell-1:hover { transform: translate(-3px, -3px); }
+.cell-2:hover { transform: translate(3px, -3px); }
+.cell-3:hover { transform: translate(-3px, 3px); }
+.cell-4:hover { transform: translate(3px, 3px); }
+
+.animated-graphic-bee {
+    animation: graphic-bee-float 4s ease-in-out infinite;
+    transform-origin: 100px 100px;
+}
+
+@keyframes graphic-bee-float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(-3deg);
+    }
+}
+
+.wing-left {
+    transform-origin: 88px 80px;
+    animation: flap-left 0.15s ease-in-out infinite alternate;
+}
+
+.wing-right {
+    transform-origin: 112px 80px;
+    animation: flap-right 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes flap-left {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-15deg); }
+}
+
+@keyframes flap-right {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(15deg); }
 }
 
 /* -------------------- Overview Section -------------------- */
@@ -260,10 +340,18 @@ h2:hover {
 
 .wellness-note {
     padding: 3.2rem;
+    border: 0.1rem solid var(--border-yellow-soft);
     border-left: 0.6rem solid var(--color-yellow-primary);
     border-radius: 2.4rem;
     background: var(--color-white-primary);
     box-shadow: 0 1.6rem 4rem var(--shadow-black-soft);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wellness-note:hover {
+    transform: translateY(-0.4rem);
+    border-color: var(--border-yellow-strong);
+    box-shadow: 0 2rem 5rem var(--shadow-black-strong);
 }
 
 .wellness-note h3,
@@ -283,12 +371,14 @@ h2:hover {
     border-radius: 2.4rem;
     background: var(--color-white-primary);
     box-shadow: 0 1.4rem 4rem var(--shadow-black-soft);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .link-card:hover,
 .quote-card:hover,
 .awareness-card:hover {
+    transform: translateY(-0.4rem);
+    border-color: var(--border-yellow-strong);
     box-shadow: 0 2rem 5rem var(--shadow-black-strong);
 }
 
@@ -333,13 +423,20 @@ h2:hover {
     color: var(--color-black-primary);
     background: var(--color-white-primary);
     outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-row input:hover,
+.form-row select:hover,
+.form-row textarea:hover {
+    border-color: var(--border-yellow-strong);
 }
 
 .form-row input:focus,
 .form-row select:focus,
 .form-row textarea:focus {
     border-color: var(--color-yellow-primary);
+    background-color: var(--color-white-secondary);
     box-shadow: 0 0 0 0.4rem var(--overlay-yellow-muted);
 }
 
@@ -353,22 +450,37 @@ h2:hover {
     cursor: pointer;
 }
 
+@keyframes resultFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(0.8rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .analysis-result {
-    margin-top: 2rem;
-    padding: 1.4rem 1.6rem;
-    border: 0.1rem solid var(--border-yellow-soft);
+    margin-top: 2.2rem;
+    padding: 1.6rem 2rem;
+    border: 0.15rem solid var(--border-yellow-strong);
     border-radius: 1.4rem;
     color: var(--color-black-primary);
     background: var(--overlay-yellow-muted);
+    font-weight: 600;
+    box-shadow: 0 1rem 3rem var(--shadow-yellow-soft);
+    animation: resultFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .analysis-result:empty {
-    display: none;
+    display: none !important;
 }
 
 .analysis-result[data-type="error"] {
     border-color: rgba(190, 42, 42, 0.45);
-    background: rgba(190, 42, 42, 0.1);
+    background: rgba(190, 42, 42, 0.15);
+    box-shadow: none;
 }
 
 /* -------------------- Awareness Section -------------------- */
@@ -426,14 +538,18 @@ h2:hover {
     box-shadow: 0 1.4rem 3rem var(--shadow-yellow-soft);
     opacity: 1;
     transform: translateY(0);
-    transition: box-shadow 0.3s ease, background 0.3s ease;
+    transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.scroll-top:hover,
-.scroll-top:active {
+.scroll-top:hover {
     color: var(--color-black-primary);
     background: var(--color-yellow-primary);
-    box-shadow: 0 1.4rem 3rem var(--shadow-yellow-soft);
+    box-shadow: 0 1.8rem 3.8rem var(--shadow-yellow-soft);
+    transform: translateY(-0.4rem) rotate(12deg) scale(1.08);
+}
+
+.scroll-top:active {
+    transform: translateY(0) scale(0.95);
 }
 
 @supports (animation-timeline: scroll(root)) {
@@ -508,4 +624,61 @@ address,
     border-top: 0.1rem solid var(--border-yellow-soft);
     text-align: center;
     color: var(--color-black-secondary);
+}
+
+/* -------------------- Form Extras -------------------- */
+.label-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    width: 100%;
+}
+
+.char-counter {
+    font-size: 1.3rem;
+    color: var(--color-gray-secondary);
+    font-weight: 600;
+}
+
+.quick-examples {
+    margin-top: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.quick-examples-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-black-primary);
+    display: block;
+    margin-bottom: 0.8rem;
+}
+
+.sample-sentences {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.sample-btn {
+    padding: 0.6rem 1.4rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-black-primary);
+    background: var(--color-white-secondary);
+    border: 0.1rem solid var(--border-yellow-soft);
+    border-radius: 999rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sample-btn:hover {
+    background: var(--color-yellow-primary);
+    border-color: var(--color-yellow-primary);
+    transform: translateY(-0.2rem);
+    box-shadow: 0 0.8rem 1.6rem var(--shadow-yellow-soft);
+}
+
+.sample-btn:active {
+    transform: translateY(0) scale(0.97);
 }

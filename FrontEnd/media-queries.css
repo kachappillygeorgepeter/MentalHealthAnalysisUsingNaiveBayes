@@ -1,5 +1,20 @@
 /* -------------------- Responsive Media Queries -------------------- */
 
+/* Ultra-Wide Monitors */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 140rem;
+    }
+
+    .hero-grid {
+        width: 60%;
+    }
+
+    .hero-content h1 {
+        font-size: 6.4rem;
+    }
+}
+
 @media (max-width: 1536px) {
     .container {
         max-width: 112rem;
@@ -28,9 +43,10 @@
     }
 }
 
+/* Landscape Tablets & iPads */
 @media (max-width: 1024px) {
     .section {
-        padding: 6rem 0;
+        padding: 6.4rem 0;
     }
 
     .section-heading,
@@ -42,14 +58,24 @@
         width: 90%;
     }
 
-    .split-layout,
-    .analysis-grid,
+    /* Maintain 2 columns with reduced gaps instead of stacking too early */
+    .split-layout {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 3rem;
+    }
+
+    .analysis-grid {
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 3.6rem;
+    }
+
     .awareness-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.4rem;
     }
 
     .hero {
-        min-height: 72vh;
+        min-height: 65vh;
     }
 
     .hero-content h1 {
@@ -58,6 +84,31 @@
 
     .footer-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 4rem;
+    }
+}
+
+/* Portrait Tablets / Small Screens */
+@media (max-width: 820px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .hero-graphic {
+        order: -1;
+    }
+
+    .split-layout,
+    .analysis-grid,
+    .awareness-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
     }
 }
 
@@ -98,10 +149,6 @@
     .quote-card,
     .awareness-card {
         padding: 2.6rem;
-    }
-
-    .footer-grid {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -163,5 +210,31 @@
     .scroll-top {
         right: 1.6rem;
         bottom: 1.6rem;
+    }
+}
+
+/* Very Small Mobile Devices */
+@media (max-width: 360px) {
+    html {
+        font-size: 50%;
+    }
+
+    .nav-links a {
+        padding: 0.6rem 0.8rem;
+        font-size: 1.4rem;
+    }
+
+    .logo {
+        font-size: 1.8rem;
+    }
+
+    .logo-mark {
+        width: 3.8rem;
+        height: 3.8rem;
+        border-radius: 1rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.8rem;
     }
 }

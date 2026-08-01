@@ -71,6 +71,27 @@ function formatAnalysisResult(data)
 //Prevent default lets us handle the form submission with our custom logic instead of the browser's default behavior (which would typically involve a page reload).
 //.focus() is used to set the cursor back to the input field, allowing the user to quickly correct their input without having to click back into the field.
 
+const charCountSpan = document.querySelector("#char-count");
+
+function updateCharCount() {
+    if (sentenceInput && charCountSpan) {
+        charCountSpan.textContent = sentenceInput.value.length;
+    }
+}
+
+sentenceInput?.addEventListener("input", updateCharCount);
+
+const sampleButtons = document.querySelectorAll(".sample-btn");
+sampleButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        if (sentenceInput) {
+            sentenceInput.value = btn.dataset.text;
+            updateCharCount();
+            sentenceInput.focus();
+        }
+    });
+});
+
 form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const sentence=sentenceInput.value.trim();
