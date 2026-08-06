@@ -5,7 +5,11 @@
 const form=document.querySelector(".link-form");
 const sentenceInput=document.querySelector("#analysis-sentence");
 const submitButton=form?.querySelector(".form-button");
-const API_URL="https://mental-health-analysis-using-naive.vercel.app/process";
+const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8000"
+    : "https://mental-health-analysis-using-naive.vercel.app";
+const API_URL = `${API_BASE}/process`;
+const RANDOM_SENTENCE_URL = `${API_BASE}/random-sentence`;
 const resultBox=document.querySelector(".analysis-result");
 // Function is used to display messages in the result box. 
 // It accepts a message and an optional type parameter to indicate the nature of the message (e.g., info, success, error).
@@ -83,11 +87,32 @@ sentenceInput?.addEventListener("input", updateCharCount);
 
 const sampleButtons = document.querySelectorAll(".sample-btn");
 sampleButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-        if (sentenceInput) {
-            sentenceInput.value = btn.dataset.text;
-            updateCharCount();
-            sentenceInput.focus();
+    btn.addEventListener("click", async () => {
+        if (!sentenceInput) return;
+        const emotion = btn.dataset.emotion;
+        if (!emotion) return;
+
+        const originalText = btn.textContent;
+        try {
+            btn.disabled = true;
+            btn.textContent = "Loading...";
+            
+            const response = await fetch(`${RANDOM_SENTENCE_URL}?emotion=${emotion}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch sentence");
+            }
+            const data = await response.json();
+            if (data && data.sentence) {
+                sentenceInput.value = data.sentence;
+                updateCharCount();
+                sentenceInput.focus();
+            }
+        } catch (error) {
+            console.error("Error fetching random sentence:", error);
+            showResult("Failed to fetch a random sentence. Please try again or start the backend locally.", "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     });
 });

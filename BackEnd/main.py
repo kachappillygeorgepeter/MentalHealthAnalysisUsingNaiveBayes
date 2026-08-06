@@ -418,6 +418,28 @@ def health():
     }
 
 
+@app.get("/random-sentence")
+def get_random_sentence(emotion: str):
+    import random
+    emotion_lower = emotion.lower().strip()
+    if emotion_lower not in EMOTIONS:
+        raise HTTPException(status_code=400, detail=f"Invalid emotion: {emotion}. Must be one of {EMOTIONS}")
+    
+    file_path = os.path.join(os.path.dirname(__file__), "TrainingData", f"training_sentences_{emotion_lower}.txt")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail=f"Training file for emotion '{emotion_lower}' not found.")
+        
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            sentences = [line.strip() for line in f if line.strip()]
+        if not sentences:
+            raise HTTPException(status_code=404, detail=f"No sentences found in training file for emotion '{emotion_lower}'.")
+        return {"emotion": emotion_lower, "sentence": random.choice(sentences)}
+    except Exception as e:
+        logger.exception(f"Failed to read training sentences for emotion {emotion_lower}")
+        raise HTTPException(status_code=500, detail=f"Error reading training sentences: {str(e)}")
+
+
 # Define a POST endpoint at /process that accepts JSON data matching the InputText model,
 # keeps emotional words from the input text, performs later actions on the cleaned text,
 # and returns a prediction response.
