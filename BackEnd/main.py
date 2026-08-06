@@ -472,7 +472,7 @@ def process(payload: InputText):
                 response["chatbot_response"] = (
                     "No strong emotional signals were detected in your message. "
                     "If you'd like more personalised support, please configure "
-                    "the GEMINI_API_KEY in apiDetails.env."
+                    "the GEMINI_API_KEY."
                 )
                 response["chatbot_used"] = False
 
