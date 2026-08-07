@@ -1,37 +1,30 @@
 # Sentiment Analysis System
 
-A **FastAPI-based Sentiment Analysis API** that uses a **Naive Bayes** classifier to detect the emotional tone of user's message. The model classifies text into one of nine emotions:
+A FastAPI-based sentiment analysis API using a Naive Bayes classifier to detect emotional tone from text. The model predicts one of nine emotions and returns a confidence score.
 
-- 😊 Happy
-- 😢 Sad
-- 😕 Confused
-- 😠 Angry
-- 😨 Fear
-- 🤢 Disgust
-- 😐 Neutral
-- 😟 Anxiety
-- ☠️ Suicidal
-- 😔 Depressed
+## Key Features
 
-The system stores emotional words and learnt probabilities inside a **MySQL** database and updates them through a training script using custom training datasets.
+- Naive Bayes emotion classification
+- FastAPI backend
+- MySQL storage for learned word statistics
+- Stop word removal and emotional word extraction
+- Custom training from text datasets
+- Confidence scoring for predictions
 
----
+## Supported Emotions
 
-# Features
+- Happy
+- Sad
+- Confused
+- Angry
+- Fear
+- Disgust
+- Neutral
+- Anxiety
+- Suicidal
+- Depressed
 
-- Emotion detection using **Naive Bayes Classification**
-- API built with **FastAPI**
-- MySQL database for storing emotional words and probabilities
-- Automatic stop-word removal
-- Emotional word extraction
-- Custom training using text datasets
-- Probability based confidence score
-- Easy to expand by adding new emotional words and training sentences
-- Normalized single-line training records for more stable parsing and training
-
----
-
-# Technologies Used
+## Technology
 
 - Python 3.x
 - FastAPI
@@ -39,164 +32,30 @@ The system stores emotional words and learnt probabilities inside a **MySQL** da
 - mysql-connector-python
 - python-dotenv
 - Pydantic
-- RegEx
-- OS
 
----
+## What the Project Does
 
-# How It Works
+1. Receives user text
+2. Removes stop words
+3. Extracts emotional terms
+4. Uses Naive Bayes probabilities to predict emotion
+5. Returns emotion and confidence
 
-## 1. User sends text
+## Data Structure
 
-Example
+The backend stores:
 
-```text
-I feel lonely and exhausted today.
-```
+- stop words for filtering input
+- emotional words with learned probabilities
+- prior emotion probabilities
 
----
+## Training Data
 
-## 2. Stop words are removed
+Training sentences are stored in the `TrainingData/` folder, with one file per emotion. Each line is treated as a separate training example.
 
-Example
+## Notes
 
-```text
-lonely exhausted today
-```
-
----
-
-## 3. Emotional words are extracted
-
-Only words that exist inside the **emotional_words** table are kept.
-
-Example
-
-```text
-lonely exhausted
-```
-
----
-
-## 4. Naive Bayes Prediction
-
-For every emotional word, the trained probability
-
-```
-P(word | emotion)
-```
-
-is loaded from the database.
-
-The backend multiplies the probabilities together with the prior probability
-
-```
-P(emotion)
-```
-
-and predicts the emotion with the highest score.
-
----
-
-## 5. API Response
-
-Example
-
-```json
-{
-  "prediction_message": "sad",
-  "confidence": 0.94,
-  "filtered_text": "lonely exhausted"
-}
-```
-
----
-
-# Database
-
-The project uses three tables.
-
-## 1. stop_words
-
-Stores common English stop words.
-
-Example
-
-```text
-the
-is
-am
-have
-will
-because
-```
-
-These are removed before prediction.
-
----
-
-## 2. emotional_words
-
-Stores every emotional word together with its learned statistics.
-
-Example
-
-| Word   | Happy Score | Sad Score | Angry Score |
-| ------ | ----------- | --------- | ----------- |
-| happy  | 0.42        | 0.01      | 0.01        |
-| lonely | 0.01        | 0.53      | 0.02        |
-
-Each word stores
-
-- Count for every emotion
-- Probability for every emotion
-
----
-
-## 3. message_emotion_probabilities
-
-Stores
-
-```
-P(emotion)
-```
-
-Example
-
-| Emotion | Probability |
-| ------- | ----------- |
-| Happy   | 0.21        |
-| Sad     | 0.18        |
-| Neutral | 0.25        |
-
----
-
-# Training the Model
-
-The project does **not** use pre-trained machine learning libraries.
-
-Instead, it trains its own Naive Bayes model.
-
-Training data is stored inside
-
-```text
-TrainingData/
-```
-
-Each emotion has its own text file.
-
-Example
-
-```
-training_sentences_happy.txt
-training_sentences_sad.txt
-training_sentences_angry.txt
-training_sentences_anxiety.txt
-training_sentences_suicidal.txt
-training_sentences_depressed.txt
-```
-
-Each record is stored as a single line to keep the training data structure consistent and easier for the training script to process.
+This project trains its own classifier and does not use external pretrained machine learning models.
 
 Example
 
