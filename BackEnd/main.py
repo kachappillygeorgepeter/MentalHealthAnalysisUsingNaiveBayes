@@ -119,16 +119,14 @@ def get_chatbot_response(user_text: str) -> str:
     Sends the original text to Google Gemini for a natural-language
     mental-health-aware reply, instead of simply returning 'Neutral'.
 
-    Returns the chatbot reply string, or a safe fallback message if the
-    API key is missing or the call fails.
+    Returns the chatbot reply string, or raises an exception if the API key
+    is missing, invalid, or the call fails.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "your_gemini_api_key_here":
-        logger.warning(
-            "GEMINI_API_KEY is not configured in apiDetails.env. "
-            "Returning neutral fallback without chatbot response."
+        raise ValueError(
+            "GEMINI_API_KEY is not configured or contains placeholder value in apiDetails.env."
         )
-        return None  # Caller will handle the missing-key case gracefully.
 
     model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 
@@ -146,15 +144,14 @@ def get_chatbot_response(user_text: str) -> str:
         )
 
         response = model.generate_content(f"{system_prompt}\n\nUser: {user_text}")
+        if not response or not response.text:
+            raise RuntimeError("Gemini API returned an empty response.")
         return response.text.strip()
 
-    except Exception:
-        logger.exception(
-            "Chatbot API call failed for text: %r. Returning None so the "
-            "caller falls back to a neutral response.",
-            user_text[:80],
-        )
-        return None
+    except Exception as e:
+        logger.exception("Chatbot API call failed for text: %r", user_text[:80])
+        raise e
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -455,30 +452,51 @@ def process(payload: InputText):
         if not cleaned_text:
             # No emotional words were detected — delegate to the Gemini chatbot
             # for a more meaningful, context-aware natural language response.
-            chatbot_reply = get_chatbot_response(payload.text)
+            try:
+                chatbot_reply = get_chatbot_response(payload.text)
+                response = {
+                    "prediction_message": "Neutral",
+                    "confidence": 1.0,
+                    "filtered_text": cleaned_text,
+                    "chatbot_response": chatbot_reply,
+                    "chatbot_used": True,
+                }
+                return response
 
-            response = {
-                "prediction_message": "Neutral",
-                "confidence": 1.0,
-                "filtered_text": cleaned_text,
-            }
-
-            if chatbot_reply:
-                # Chatbot responded successfully — include its reply.
-                response["chatbot_response"] = chatbot_reply
-                response["chatbot_used"] = True
-            else:
-                # API key not set or call failed — inform the client gracefully.
-                response["chatbot_response"] = (
-                    "No strong emotional signals were detected in your message. "
-                    "If you'd like more personalised support, please configure "
-                    "the GEMINI_API_KEY."
+            except Exception as api_error:
+                # ── Print the full API problem to the backend console ──────────
+                error_type = type(api_error).__name__
+                error_msg  = str(api_error)
+                logger.error(
+                    "\n"
+                    "╔══════════════════════════════════════════════════════╗\n"
+                    "║          GEMINI API ERROR — SERVER SIDE              ║\n"
+                    "╠══════════════════════════════════════════════════════╣\n"
+                    "║  Error Type : %-38s║\n"
+                    "║  Details    : %-38s║\n"
+                    "╚══════════════════════════════════════════════════════╝",
+                    error_type,
+                    error_msg[:38],
                 )
-                response["chatbot_used"] = False
+                logger.exception("Full traceback for Gemini API failure:")
+                # Return a 503 so the frontend knows to display maintenance msg
+                raise HTTPException(
+                    status_code=503,
+                    detail={
+                        "error":      "SERVER_UNDER_MAINTENANCE",
+                        "error_type": error_type,
+                        "api_error":  error_msg,
+                    },
+                ) from api_error
 
-            return response
-
+        # ── Emotional words found — use local Naive Bayes logic ────────────────
         result = perform_actions(cleaned_text)
+        # Print the local prediction to the backend console
+        print(
+            f"\n[LOCAL PREDICTION] Emotion: {result['prediction_message'].upper()!r}  |  "
+            f"Confidence: {round(result['confidence'] * 100, 2)}%  |  "
+            f"Filtered text: {cleaned_text!r}"
+        )
         return {
             "prediction_message": result["prediction_message"],
             "confidence": result["confidence"],

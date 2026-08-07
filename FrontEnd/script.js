@@ -35,7 +35,7 @@ function setLoading(isLoading)
 // Send the sentence to the backend server and receive the analysis result
 // fetch gets data by default, using POST ensures sending data
 // Headers specify that the content type is JSON and the body contains the sentence to be analyzed, also in JSON format.
-// If response is not ok, an error is thrown to be caught in the catch block of the event listener.
+// If the backend returns 503 (API issue), throw a special MaintenanceError so the caller can show the maintenance screen.
 async function analyzeSentence(sentence) 
 {
     const response=await fetch(API_URL,{
@@ -45,13 +45,33 @@ async function analyzeSentence(sentence)
         },
         body:JSON.stringify({ text: sentence }),
     });
+
+    const responseData = await response.json().catch(() => null);
+
+    if (response.status === 503) {
+        // API is having issues — log the full details to the browser console.
+        const detail = responseData?.detail || {};
+        console.error(
+            "%c⚠ GEMINI API ISSUE DETECTED",
+            "color: #ff6b6b; font-size: 14px; font-weight: bold;"
+        );
+        console.error("Error Type :", detail.error_type  || "Unknown");
+        console.error("API Error  :", detail.api_error   || "No details returned.");
+        console.error("Full detail:", detail);
+        // Throw a typed error so the form handler shows "SERVER UNDER MAINTAINENCE"
+        const err = new Error("SERVER_UNDER_MAINTENANCE");
+        err.isApiMaintenance = true;
+        throw err;
+    }
+
     if (!response.ok) {
-        const errorData=await response.json().catch(() => null);
-        const detail=errorData?.detail?.message || errorData?.detail || response.statusText;
+        const detail = responseData?.detail?.message || responseData?.detail || response.statusText;
         throw new Error(`Backend request failed with status ${response.status}: ${detail}`);
     }
-    return response.json();
+
+    return responseData;
 }
+
 
 // This function formats the analysis result received from the backend for display in the result box.
 // It return either both prediction and percentage or any one or a message
@@ -130,11 +150,33 @@ form?.addEventListener("submit", async (event) => {
         setLoading(true);
         showResult("Analyzing sentence...", "loading");
         const data=await analyzeSentence(sentence);
+
+        // If the backend used local Naive Bayes logic, log it to the browser console too.
+        if (!data.chatbot_used) {
+            console.log(
+                "%c[LOCAL PREDICTION]",
+                "color: #4caf50; font-weight: bold;",
+                `Emotion: ${data.prediction_message?.toUpperCase()}`,
+                `| Confidence: ${Math.round(Number(data.confidence) * 100)}%`,
+                `| Filtered text: "${data.filtered_text}"`
+            );
+        }
+
         showResult(formatAnalysisResult(data), "success");
     } catch (error) {
-        showResult("Unable to analyze right now. Start the backend with: py -m uvicorn main:app --reload, then check /health.", "error");
-        console.error(error);
+        if (error.isApiMaintenance) {
+            // API quota/key/network failure — tell the user and the console
+            console.error(
+                "%c🔧 SERVER UNDER MAINTAINENCE — Gemini API is currently unavailable.",
+                "color: #ff6b6b; font-weight: bold; font-size: 13px;"
+            );
+            showResult("🔧 SERVER UNDER MAINTAINENCE", "error");
+        } else {
+            showResult("Unable to analyze right now. Start the backend with: py -m uvicorn main:app --reload, then check /health.", "error");
+            console.error(error);
+        }
     } finally {
         setLoading(false);
     }
 });
+
