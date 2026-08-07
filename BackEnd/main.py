@@ -128,7 +128,7 @@ def get_chatbot_response(user_text: str) -> str:
             "GEMINI_API_KEY is not configured or contains placeholder value in apiDetails.env."
         )
 
-    model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+    model_name = os.getenv("GEMINI_MODEL")
 
     try:
         genai.configure(api_key=api_key)
@@ -483,7 +483,6 @@ def process(payload: InputText):
                 raise HTTPException(
                     status_code=503,
                     detail={
-                        "error":      "SERVER_UNDER_MAINTENANCE",
                         "error_type": error_type,
                         "api_error":  error_msg,
                     },
