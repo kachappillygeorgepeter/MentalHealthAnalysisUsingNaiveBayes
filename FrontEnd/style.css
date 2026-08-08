@@ -184,9 +184,9 @@ h3:hover {
     width: 4.4rem;
     height: 4.4rem;
     border-radius: 1.4rem;
-    color: var(--color-black-primary);
-    font-size: 1.4rem;
     background: var(--color-yellow-primary);
+    object-fit: cover;
+    overflow: hidden;
 }
 
 .nav-links {
